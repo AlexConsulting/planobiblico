@@ -23,13 +23,11 @@
             sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            // Cores para o progresso
+            // Usamos Indigo como primary para consistência
             'primary': {
-              500: '#4f46e5', // Indigo padrão (Em Dia)
+              500: '#4f46e5', // Indigo padrão
               600: '#4338ca', // Indigo mais escuro para hover
-            },
-            'progress-ok': '#4f46e5', // Indigo
-            'progress-late': '#f97316', // Orange
+            }
           }
         }
       }
@@ -42,13 +40,13 @@
     /* transição suave para a barra de progresso */
     #progressoBar { transition: width 350ms ease; }
     
-    /* Destaque ao clicar no botão "Hoje" (Contorno) */
+    /* NOVO: Estilo para o destaque ao clicar no botão "Hoje" (Contorno) */
     #btnHoje:active { 
         transform: scale(.995); 
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5); /* Contorno suave */
     }
 
-    /* Destaque visual para o dia atual no grid de leitura */
+    /* NOVO: Destaque visual para o dia atual no grid de leitura */
     .today-highlight {
         border: 2px solid #4f46e5 !important; /* Cor primária */
         background-color: #eef2ff !important; /* Indigo-50 claro */
@@ -60,9 +58,6 @@
         background-color: rgb(30 41 59 / var(--tw-bg-opacity)) !important; /* slate-800 */
         border-color: #6366f1 !important; /* Indigo-500 light */
     }
-    
-    /* Classe oculta */
-    .hidden-page { display: none; }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col font-sans">
@@ -192,11 +187,11 @@
       dia_leitura: 'Dia',
       lang_name: 'Português',
       flag_code: 'br',
-      hoje: 'HOJE',
-      status_late: 'ATRASADO', // Novo
-      status_ok: 'EM DIA',      // Novo
-      btn_start: 'INICIAR PLANO', // Novo
-      confirm_change: 'Tem certeza que deseja trocar de plano? Seu histórico de leitura ATUAL será perdido.', // Novo
+      hoje: 'HOJE', 
+      // NOVO: Textos para o Grid de Planos
+      plano_ativo: 'PLANO ATIVO',
+      continuar: 'Continuar',
+      iniciar: 'Iniciar' 
     },
     en: {
         titulo: 'Bible Plan',
@@ -222,11 +217,11 @@
         dia_leitura: 'Day',
         lang_name: 'English',
         flag_code: 'us',
-        hoje: 'TODAY',
-        status_late: 'BEHIND SCHEDULE', // Novo
-        status_ok: 'ON TRACK',          // Novo
-        btn_start: 'START PLAN',        // Novo
-        confirm_change: 'Are you sure you want to change plans? Your CURRENT reading history will be lost.', // Novo
+        hoje: 'TODAY', 
+        // NEW: Texts for Plan Grid
+        plano_ativo: 'ACTIVE PLAN',
+        continuar: 'Continue',
+        iniciar: 'Start'
     },
     es: {
         titulo: 'Plan Bíblico',
@@ -252,11 +247,11 @@
         dia_leitura: 'Day',
         lang_name: 'Español',
         flag_code: 'es',
-        hoje: 'HOY',
-        status_late: 'ATRASADO', // Novo
-        status_ok: 'AL DÍA',     // Novo
-        btn_start: 'INICIAR PLAN', // Novo
-        confirm_change: '¿Está seguro de que desea cambiar de plan? Su historial de lectura ACTUAL se perderá.', // Novo
+        hoje: 'HOY', 
+        // NUEVO: Textos para el Grid de Planes
+        plano_ativo: 'PLAN ACTIVO',
+        continuar: 'Continuar',
+        iniciar: 'Iniciar'
     }
   };
   
@@ -269,7 +264,7 @@
   const DAYS_PER_MONTH = [31,28,31,30,31,30,31,31,30,31,30,31];
   const BOOKS = [
     { key:'Genesis', ch:50, name:{pt:'Gênesis', en:'Genesis', es:'Génesis'} },
-    { key:'Exodus', ch:40, name:{pt:'Êxodo', en:'Exodus', es:'Exodus'} },
+    { key:'Exodus', ch:40, name:{pt:'Êxodo', en:'Exodus', es:'Éxodo'} },
     { key:'Leviticus', ch:27, name:{pt:'Levítico', en:'Leviticus', es:'Levítico'} },
     { key:'Numbers', ch:36, name:{pt:'Números', en:'Numbers', es:'Números'} },
     { key:'Deuteronomy', ch:34, name:{pt:'Deuteronômio', en:'Deuteronomy', es:'Deuteronomio'} },
@@ -452,8 +447,7 @@
   let state = {
     // Carrega o idioma e o plano do localStorage ou usa o padrão 'pt'/'tradicional'
     idioma: localStorage.getItem('bib_idioma') || 'pt',
-    planoId: localStorage.getItem('bib_plano') || null, 
-    startDate: localStorage.getItem('bib_startDate') || null, // Carrega a data de início
+    planoId: localStorage.getItem('bib_plano') || null, // Começa como null para forçar a seleção se não houver
     selectedMonth: 1,
     selectedDayOfMonth: null,
   };
@@ -475,46 +469,6 @@
     let s=0; for(let i=0;i<month-1;i++) s+=DAYS_PER_MONTH[i]; return s+day;
   }
 
-  // NOVA FUNÇÃO: Calcula o progresso e o status de atraso
-  function calculateProgressAndStatus(planoId){
-    if(!planoId) return { read: 0, total: 365, requiredDay: 0, isLate: false };
-    
-    const plan = getPlan(planoId, state.idioma);
-    const total = plan.length;
-    let read = 0;
-    // Percorre todos os 365 dias para contar quantos foram lidos
-    for(let i=0;i<total;i++){ 
-        if(localStorage.getItem(`${planoId}_day_${i+1}`)) read++; 
-    }
-
-    let requiredDay = 0;
-    let isLate = false;
-
-    if(state.startDate){
-        const start = new Date(state.startDate);
-        const today = new Date();
-        // Zera as horas para comparação justa (apenas a data importa)
-        start.setHours(0,0,0,0);
-        today.setHours(0,0,0,0);
-        
-        // Calcula o número de dias decorridos (daysPassed) e adiciona 1 (o dia de hoje)
-        const timeDiff = today.getTime() - start.getTime();
-        // O requiredDay (dia que deveria estar) é o (dias passados + 1)
-        const daysPassed = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
-        
-        requiredDay = daysPassed > 0 ? daysPassed + 1 : 1; // Dia de leitura que deveria estar (a partir do dia 1)
-        requiredDay = Math.min(requiredDay, total); // Não ultrapassa o total de dias do plano (365)
-
-        // Se a contagem de dias lidos for menor que o dia requerido, está atrasado
-        if (read < requiredDay) {
-            isLate = true;
-        }
-    }
-    
-    return { read, total, requiredDay, isLate };
-  }
-
-
   // Alterna a visualização entre as duas "páginas"
   function showPage(pageId) {
       const selecao = document.getElementById('paginaSelecao');
@@ -523,21 +477,21 @@
 
       if (pageId === 'paginaPlano' && state.planoId) {
           // Exibir Página do Plano
-          selecao.classList.add('hidden-page');
-          plano.classList.remove('hidden-page');
+          selecao.classList.add('hidden'); // Usa 'hidden' para ocultar
+          plano.classList.remove('hidden'); // Usa 'hidden' para mostrar
           
           document.getElementById('tituloApp').innerText = ` ${texts.titulo}`;
           document.getElementById('subtituloApp').innerText = texts.subtitulo;
           
-          renderPlanGrid(); // Necessário para atualizar o status do card selecionado
+          renderPlanGrid();
           renderMonths(); 
           renderDays(state.selectedMonth); 
           updateProgressUI();
 
       } else {
           // Exibir Página de Seleção
-          plano.classList.add('hidden-page');
-          selecao.classList.remove('hidden-page');
+          plano.classList.add('hidden');
+          selecao.classList.remove('hidden');
           
           document.getElementById('tituloApp').innerText = ` ${texts.titulo_selecao}`;
           document.getElementById('subtituloApp').innerText = texts.subtitulo_selecao;
@@ -547,184 +501,58 @@
       if(window.lucide) window.lucide.createIcons();
   }
 
-  // Função para iniciar o plano (salva a data)
-  function startPlanDate(planoId){
-      state.planoId = planoId;
-      localStorage.setItem('bib_plano', planoId);
-      
-      const today = new Date();
-      today.setHours(0,0,0,0); // Zera hora para uniformidade
-      state.startDate = today.toISOString().split('T')[0];
-      localStorage.setItem('bib_startDate', state.startDate);
-      
-      showPage('paginaPlano');
-  }
-
-  // NOVA FUNÇÃO: Troca o plano e limpa o histórico
-  function confirmChangePlan(){
-      const texts = UI_TEXT[state.idioma];
-      const isConfirmed = confirm(texts.confirm_change);
-      
-      if(isConfirmed){
-          // 1. Limpa o histórico de leitura do plano ATUAL
-          if(state.planoId){
-              for(let i=1; i<=365; i++){
-                  localStorage.removeItem(`${state.planoId}_day_${i}`);
-              }
-          }
-          
-          // 2. Limpa o plano e a data de início
-          state.planoId = null;
-          state.startDate = null;
-          localStorage.removeItem('bib_plano');
-          localStorage.removeItem('bib_startDate');
-          
-          // 3. Volta para a página de seleção
-          showPage('paginaSelecao');
-      }
-  }
-
-
   // ---------- RENDER FUNCTIONS ----------
   function renderPlanGrid(){
     const container = document.getElementById('gridPlanos'); 
     if (!container) return; 
     
     container.innerHTML='';
-    const texts = UI_TEXT[state.idioma];
-    const planoTexts = texts.planos;
+    const texts = UI_TEXT[state.idioma].planos;
+    const commonTexts = UI_TEXT[state.idioma]; 
     const icons = ['calendar','clock','layers','heart','book-open','sun'];
-
-    // Calcula o status do plano ATIVO (se houver)
-    const activeStatus = state.planoId ? calculateProgressAndStatus(state.planoId) : null;
-
-    planoTexts.forEach((p, idx)=>{
-      const isSelected = state.planoId===p.id;
-      
-      let cardClasses = 'plan-button flex flex-col items-center p-4 rounded-xl shadow-lg transition-all duration-200 text-center cursor-pointer ';
-      let iconColor = 'text-primary-500';
-      let descColor = 'text-gray-500 dark:text-gray-400';
-      let contentHtml = '';
-      
-      if (isSelected) {
-          if (!state.startDate) {
-              // 1. Plano SELECIONADO, mas NÃO INICIADO (Exibe botão INICIAR)
-              cardClasses += 'bg-white dark:bg-gray-800 ring-2 ring-primary-500 hover:shadow-xl';
-              contentHtml = `
-                <div class="mt-4 w-full">
-                    <button class="bg-primary-500 text-white text-sm font-bold w-full py-2 rounded-lg hover:bg-primary-600 transition" onclick="startPlanDate('${p.id}')">
-                        ${texts.btn_start}
-                    </button>
-                </div>
-              `;
-          } else {
-              // 2. Plano SELECIONADO e INICIADO (Exibe status Atrasado/Em Dia)
-              const isLate = activeStatus.isLate;
-              const statusLabel = isLate ? texts.status_late : texts.status_ok;
-              const bgColor = isLate ? 'bg-progress-late' : 'bg-primary-500';
-              const ringColor = isLate ? 'ring-orange-500/50' : 'ring-primary-500/50';
-              const hoverBgColor = isLate ? 'hover:bg-orange-600' : 'hover:bg-primary-600';
-              const statusBgColor = isLate ? 'bg-orange-700/50' : 'bg-indigo-700/50';
-
-              cardClasses = `plan-button flex flex-col items-center p-4 rounded-xl shadow-lg transition-all duration-200 text-center ${bgColor} text-white ring-4 ${ringColor} ${hoverBgColor} cursor-pointer`;
-              iconColor = 'text-white';
-              descColor = isLate ? 'text-orange-200' : 'text-indigo-200';
-              
-              contentHtml = `
-                <div class="mt-2 text-xs font-bold text-white uppercase px-2 py-0.5 rounded-full ${statusBgColor}">
-                    ${statusLabel}
-                </div>
-              `;
-          }
-      } else {
-          // 3. Cards NÃO selecionados
-          cardClasses += 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500';
-          // Se o plano ATIVO já tem uma data de início, os outros planos não ativos devem ter um botão de "selecionar" que dispara o alerta.
-          if(state.planoId && state.startDate){
-            // Se já tem um plano INICIADO, clicar em outro deve disparar o alerta
-            contentHtml = `
-                <div class="mt-4 w-full">
-                    <button class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-bold w-full py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition" 
-                            onclick="confirmChangePlanAndSelect('${p.id}')">
-                        SELECIONAR
-                    </button>
-                </div>
-            `;
-            // Remove a ação padrão do card para forçar o uso do botão
-            cardClasses = cardClasses.replace('cursor-pointer', 'cursor-default');
-          } else {
-            // Se NENHUM plano foi iniciado ainda (ou planoId é null e startDate é null), clicar no card SELECIONA o plano
-            contentHtml = `<div class="mt-4 h-8"></div>`; // Espaço vazio para manter altura
-            cardClasses = cardClasses.replace('cursor-default', 'cursor-pointer');
-          }
-      }
-
-      const iconName = icons[idx] || 'book';
+    texts.forEach((p, idx)=>{
       const btn = document.createElement('button');
       btn.type='button';
-      btn.className=cardClasses;
+      const isSelected = state.planoId===p.id; // <-- Check if current plan is selected
+      
+      // Determine classes for selected vs unselected card
+      const cardClasses = isSelected 
+          ? 'bg-primary-500 text-white ring-4 ring-primary-500/50 hover:bg-primary-600' // Selected Style
+          : 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500'; // Unselected Style
+          
+      btn.className='plan-button flex flex-col items-center p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' + cardClasses;
       btn.style.minHeight='120px';
       
+      // Determine colors for content
+      const iconColor = isSelected ? 'text-white' : 'text-primary-500';
+      const descColor = isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400';
+      const iconName = icons[idx] || 'book';
+      
+      // Dynamic Text: Status (Description)
+      const statusText = isSelected ? commonTexts.plano_ativo : p.desc;
+      
+      // Dynamic Text: Action (Button Text)
+      const actionText = isSelected ? commonTexts.continuar : commonTexts.iniciar;
+      const actionClasses = isSelected 
+          ? 'mt-3 text-base font-bold text-white' // Style for 'Continuar' on selected card
+          : 'mt-3 text-base font-bold text-primary-500 dark:text-primary-400'; // Style for 'Iniciar' on unselected card
+
+
       btn.innerHTML = `\
         <div class="mb-2"><i data-lucide="${iconName}" class="lucide w-8 h-8 ${iconColor}"></i></div>\
         <div class="text-base font-bold">${p.title}</div>\
-        <div class="text-xs ${descColor} mt-1">${p.desc}</div>
-        ${contentHtml}
-      `;
-      
-      // Define a ação principal do card (só funciona se não houver um botão dentro)
-      if (isSelected) {
-          btn.onclick = () => {
-              // Se já está selecionado e iniciado, vai para a página do plano
-              if(state.startDate) showPage('paginaPlano');
-              // Se está selecionado mas não iniciado, nada acontece (o botão INICIAR está dentro do HTML)
-          };
-      } else {
-          // Se não está selecionado
-          if(!state.planoId || !state.startDate){
-              // Se não há plano ATIVO, clica no card para SELECIONAR (sem iniciar)
-              btn.onclick = ()=>{
-                state.planoId = p.id; 
-                localStorage.setItem('bib_plano', p.id);
-                // Permanece na página de seleção, agora com o card selecionado
-                renderPlanGrid(); 
-              };
-          } else {
-              // Se já tem plano ATIVO, a ação é apenas no botão dentro do card (que chama confirmChangePlanAndSelect)
-              btn.onclick = null; 
-          }
-      }
+        <p class="text-xs ${descColor} mt-1">${statusText}</p>\
+        <p class="${actionClasses}">${actionText}</p>`; // Updated to show dynamic action text
 
+      btn.onclick = ()=>{
+        state.planoId = p.id; 
+        localStorage.setItem('bib_plano', p.id); 
+        showPage('paginaPlano');
+      };
       container.appendChild(btn);
     });
     if(window.lucide) window.lucide.createIcons();
   }
-  
-  // Função auxiliar para chamar o confirmChangePlan e selecionar o novo plano se confirmado
-  window.confirmChangePlanAndSelect = (newPlanoId) => {
-      const texts = UI_TEXT[state.idioma];
-      const isConfirmed = confirm(texts.confirm_change);
-      
-      if(isConfirmed){
-          // 1. Limpa o histórico de leitura do plano ATUAL
-          if(state.planoId){
-              for(let i=1; i<=365; i++){
-                  localStorage.removeItem(`${state.planoId}_day_${i}`);
-              }
-          }
-          
-          // 2. Limpa apenas a data de início do localStorage e do state (mantém o planoId do *próximo* plano)
-          state.startDate = null;
-          localStorage.removeItem('bib_startDate');
-          
-          // 3. Define o novo plano e re-renderiza o grid (mostra o botão INICIAR no novo plano)
-          state.planoId = newPlanoId;
-          localStorage.setItem('bib_plano', newPlanoId);
-          renderPlanGrid();
-          // NOTA: O usuário terá que clicar no botão INICIAR no card recém-selecionado para começar a contagem.
-      }
-  };
-
 
   function renderMonths(){
     const div = document.getElementById('meses'); 
@@ -759,6 +587,7 @@
     
     // Calcula o dia do ano de hoje para destaque
     const today = new Date();
+    const todayDayOfYear = getDayOfYear(today);
     const todayMonth = today.getMonth() + 1;
     const todayDayOfMonth = today.getDate();
     
@@ -767,7 +596,7 @@
       const key = `${state.planoId}_day_${dayOfYear}`; const lido = localStorage.getItem(key);
       const card = document.createElement('div');
       
-      // Verifica se o dia é hoje
+      // NOVO: Verifica se o dia é hoje
       const isToday = (month === todayMonth && d === todayDayOfMonth);
       
       let cardClasses = 'p-4 rounded-xl shadow-md border-t-2 cursor-pointer transition';
@@ -847,12 +676,11 @@
   document.getElementById('fecharModal').addEventListener('click', fecharModal);
   
   document.getElementById('btnLido').addEventListener('click', ()=>{
-    if(!modalCurrentDay || !state.planoId) return; 
+    if(!modalCurrentDay) return; 
     const key = `${state.planoId}_day_${modalCurrentDay}`; 
     localStorage.setItem(key,'1'); 
     fecharModal(); 
     renderDays(state.selectedMonth); 
-    renderPlanGrid(); // Atualiza o grid para refletir o status de progresso/atraso
     updateProgressUI();
   });
 
@@ -871,53 +699,23 @@
 
   function updateProgressUI(){
     if (!state.planoId) return;
-    
-    const { read, total, isLate } = calculateProgressAndStatus(state.planoId);
       
+    const plan = getPlan(state.planoId, state.idioma);
+    const total = plan.length; let read=0;
+    for(let i=0;i<total;i++){ if(localStorage.getItem(`${state.planoId}_day_${i+1}`)) read++; }
+    const pct = Math.round((read/total)*100);
+    
     const progressoBar = document.getElementById('progressoBar');
     const textoProgresso = document.getElementById('textoProgresso');
     const textoPlanoAtual = document.getElementById('textoPlanoAtual');
 
-    const pct = Math.round((read/total)*100);
+    if (progressoBar) progressoBar.style.width = pct + '%';
+    if (textoProgresso) textoProgresso.innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}`;
     
-    // Atualiza a barra de progresso e cor
-    if (progressoBar) {
-        progressoBar.style.width = pct + '%';
-        if (isLate) {
-            progressoBar.classList.remove('bg-progress-ok');
-            progressoBar.classList.add('bg-progress-late');
-        } else {
-            progressoBar.classList.remove('bg-progress-late');
-            progressoBar.classList.add('bg-progress-ok');
-        }
-    }
-    
-    if (textoProgresso) {
-        // Exibe o status de atraso/em dia no texto de progresso
-        const statusText = isLate ? ` (${UI_TEXT[state.idioma].status_late})` : ` (${UI_TEXT[state.idioma].status_ok})`;
-        textoProgresso.innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}${state.startDate ? statusText : ''}`;
-        
-        // Aplica cor ao texto de progresso se houver data de início
-        if (state.startDate) {
-            if (isLate) {
-                textoProgresso.classList.remove('text-primary-500', 'dark:text-gray-100');
-                textoProgresso.classList.add('text-progress-late', 'dark:text-orange-400');
-            } else {
-                textoProgresso.classList.remove('text-progress-late', 'dark:text-orange-400');
-                textoProgresso.classList.add('text-primary-500', 'dark:text-gray-100');
-            }
-        } else {
-            // Se não começou, remove classes de status
-            textoProgresso.classList.remove('text-progress-late', 'dark:text-orange-400', 'text-primary-500');
-            textoProgresso.classList.add('text-gray-900', 'dark:text-gray-100');
-        }
-    }
-
     const planoEncontrado = UI_TEXT[state.idioma].planos.find(p=>p.id===state.planoId);
     const planName = planoEncontrado ? planoEncontrado.title : '---';
-    
-    // Atualiza o link de trocar plano
     if (textoPlanoAtual) textoPlanoAtual.innerText = `${UI_TEXT[state.idioma].plano}: ${planName}`;
+      
     const trocarPlanoLink = document.getElementById('trocarPlanoLink');
     if (trocarPlanoLink) trocarPlanoLink.querySelector('span').innerText = `${UI_TEXT[state.idioma].plano}: ${planName} • ${UI_TEXT[state.idioma].link_trocar}`;
   }
@@ -926,12 +724,12 @@
   document.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'trocarPlanoLink' || e.target.closest('#trocarPlanoLink')) {
           e.preventDefault();
-          confirmChangePlan();
+          showPage('paginaSelecao');
       }
   });
 
 
-  // ---------- IDIOMA DROPDOWN LOGIC (MANTIDA) ----------
+  // ---------- IDIOMA DROPDOWN LOGIC ----------
   const idiomaToggle = document.getElementById('idiomaToggle');
   const idiomaMenu = document.getElementById('idiomaMenu');
   const currentFlag = document.getElementById('currentFlag');
@@ -1007,18 +805,25 @@
 
   // NOVA FUNÇÃO: Navega para o mês atual e destaca o dia atual
   function goToToday() {
-      if (!state.planoId) { return; }
+      if (!state.planoId) {
+          // Se não houver plano, apenas garante que a página de seleção não está visível.
+          // O ideal é que este botão só seja clicável na página do plano.
+          return;
+      }
 
       const today = new Date();
-      const currentMonth = today.getMonth() + 1;
+      const currentMonth = today.getMonth() + 1; // Mês atual (1-12)
       
+      // 1. Atualiza o estado do mês
       if (state.selectedMonth !== currentMonth) {
           state.selectedMonth = currentMonth;
       }
       
+      // 2. Re-renderiza tudo para aplicar o destaque
       renderMonths();
       renderDays(state.selectedMonth);
       
+      // 3. Rola para o mês atual na barra de meses (opcional, mas bom UX)
       const mesesContainer = document.getElementById('meses');
       const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
       if (mesesContainer && currentMonthButton) {
@@ -1031,7 +836,6 @@
   function init(){
     const today = new Date(); 
     state.planoId = localStorage.getItem('bib_plano');
-    state.startDate = localStorage.getItem('bib_startDate'); // Carrega a data de início
     state.selectedMonth = state.selectedMonth || (today.getMonth()+1);
     
     // 1. Inicializa o display do idioma, o que chama updateUITexts
@@ -1042,9 +846,6 @@
     if (btnHoje) {
         btnHoje.addEventListener('click', goToToday);
     }
-
-    // CORREÇÃO: Chama showPage para garantir a renderização inicial
-    showPage(state.planoId && state.startDate ? 'paginaPlano' : 'paginaSelecao');
   }
   
   // Executa a inicialização após o DOM carregar
@@ -1077,7 +878,7 @@
       // 2. Adiciona listener ao botão de tema
       if(btnTema) btnTema.addEventListener('click', toggleTheme);
 
-      // --- Inicialização Principal ---
+      // --- Inicialização Principal (inclui o listener do botão Hoje) ---
       init();
   });
   </script>
