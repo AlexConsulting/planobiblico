@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt" class="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plano de Leitura Bíblica</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icon-css@1.0/css/flag-icon.min.css"/>
+  
+  <script type="module" src="https://unpkg.com/lucide@0.259.0/dist/lucide.esm.js"></script>
+  <script nomodule src="https://unpkg.com/lucide@0.259.0/dist/lucide.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // Ativa o modo escuro baseado na classe 'dark'
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            // Usamos Indigo como primary para consistência
+            'primary': {
+              500: '#4f46e5', // Indigo padrão
+              600: '#4338ca', // Indigo mais escuro para hover
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* pequeno polimento */
+    .plan-button:active, #btnTema:active, #idiomaToggle:active { transform: scale(.995); }
+    /* transição suave para a barra de progresso */
+    #progressoBar { transition: width 350ms ease; }
+    /* Estilo para a barra de rolagem dos meses */
+    #meses::-webkit-scrollbar { height: 6px; }
+    #meses::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+    .dark #meses::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+    
+    /* Ajuste para o tamanho da bandeira */
+    .flag-icon { width: 1.5rem; height: 1.5rem; }
+    .idioma-item .flag-icon { margin-right: 0.5rem; }
+  </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col font-sans">
+
+  <header class="p-4 sm:p-6 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="rounded-xl bg-primary-500 text-white w-10 h-10 flex items-center justify-center text-xl font-extrabold shadow-md">B</div>
+        <div>
+          <h1 id="tituloApp" class="text-xl font-bold">Plano de Leitura Bíblica Anual</h1>
+          <p id="subtituloApp" class="text-sm text-gray-600 dark:text-gray-400">Escolha um plano e comece hoje</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div id="idiomaDropdown" class="relative">
+            <button id="idiomaToggle" class="px-3 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium flex items-center gap-2" aria-label="Alterar idioma">
+                <span id="currentFlag" class="flag-icon"></span>
+                <span id="currentLangText">Português</span>
+                <i data-lucide="chevron-down" class="lucide w-4 h-4 ml-1"></i>
+            </button>
+
+            <div id="idiomaMenu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-xl shadow-2xl py-1 z-10 hidden ring-1 ring-black ring-opacity-5 origin-top-right transition-all duration-150 transform scale-95 opacity-0">
+                <button class="idioma-item w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2" data-lang="pt">
+                    <span class="flag-icon flag-icon-br"></span>
+                    <span>Português</span>
+                </button>
+                <button class="idioma-item w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2" data-lang="en">
+                    <span class="flag-icon flag-icon-us"></span>
+                    <span>English</span>
+                </button>
+                <button class="idioma-item w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2" data-lang="es">
+                    <span class="flag-icon flag-icon-es"></span>
+                    <span>Español</span>
+                </button>
+            </div>
+        </div>
+        
+        <button id="btnTema" class="p-2 px-3 rounded-xl bg-gray-200 dark:bg-gray-700 hover:scale-105 transition flex items-center justify-center font-semibold text-sm" aria-label="Alternar tema">
+          <span id="themeStatusText">Escuro 🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <div class="px-4 sm:px-6 mt-6 max-w-7xl mx-auto w-full">
+    <div class="flex items-center justify-between mb-2">
+      <div class="text-base font-semibold" id="textoProgresso">Progresso: 0 / 365</div>
+      <div class="text-sm text-gray-500 dark:text-gray-400" id="textoPlanoAtual">Plano: Tradicional</div>
+    </div>
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3.5 overflow-hidden">
+      <div id="progressoBar" class="bg-primary-500 h-3.5 rounded-full" style="width:0%"></div>
+    </div>
+  </div>
+
+  <main class="p-4 sm:p-6 flex-1 overflow-auto">
+    <section class="max-w-7xl mx-auto">
+      <h2 class="mt-8 mb-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">Selecione um Plano de Leitura</h2>
+
+      <div id="gridPlanos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mx-auto mt-4">
+        </div>
+    </section>
+
+    <section class="mt-8 max-w-7xl mx-auto">
+      <div id="meses" class="flex gap-2 overflow-x-auto pb-3 px-1 border-b border-gray-200 dark:border-gray-700"></div>
+
+      <div id="dias" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4 px-1">
+        </div>
+    </section>
+  </main>
+
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+    <div id="modalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-md shadow-2xl scale-95 transition-transform duration-300">
+      <div class="flex justify-between items-start">
+        <h3 id="modalTitulo" class="text-2xl font-extrabold text-primary-500"></h3>
+        <button id="fecharModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          <i data-lucide="x" class="lucide w-6 h-6"></i>
+        </button>
+      </div>
+
+      <ul id="modalLeituras" class="mt-4 space-y-2 text-gray-700 dark:text-gray-200 border-t pt-4 border-gray-200 dark:border-gray-700"></ul>
+
+      <div class="mt-6 flex gap-3">
+        <button id="btnLido" class="flex-1 px-4 py-3 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition shadow-lg shadow-primary-500/30">✔ Marcar como lido</button>
+        <button id="btnLerAgora" class="px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">📖 Ler agora</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-12 py-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-600 dark:text-gray-400">
+    © 2025 Alex Silva — <em>Uso livre com atribuição</em>
+  </footer>
+
+  <script>
+  
+  // ---------- CONFIG / TEXTS ----------
+  const UI_TEXT = {
+    pt: {
+      titulo: 'Plano Bíblico — 1 Ano',
+      subtitulo: 'Escolha um plano e comece hoje',
+      ler_agora: 'Ler agora',
+      planos: [
+        { id: 'tradicional', title: 'Tradicional', desc: 'Gênesis → Apocalipse (padrão)' },
+        { id: 'cronologico', title: 'Cronológico', desc: 'Ordem histórica aproximada' },
+        { id: 'atnt', title: 'AT + NT', desc: 'Um trecho do AT e um do NT por dia' },
+        { id: 'jesus', title: 'Um Ano com Jesus', desc: 'Evangelhos → Atos → Cartas → Resto' },
+        { id: 'umcap', title: '1 Capítulo/Dia', desc: '1 capítulo por dia (365 seleções)' },
+        { id: 'salmos', title: 'AT+NT+Salmos', desc: 'AT + NT + Salmo/Provérbio diário' }
+      ],
+      start: 'Dia de Leitura',
+      marcar: '✔ Marcar como lido',
+      fechar: 'Fechar',
+      progresso: 'Progresso',
+      plano: 'Plano',
+      dia_leitura: 'Dia',
+      lang_name: 'Português',
+      flag_code: 'br' // Código do Flag Icon CSS para o Brasil
+    },
+    en: {
+      titulo: 'Bible Plan — 1 Year',
+      subtitulo: 'Choose a plan and start today',
+      ler_agora: 'Read now',
+      planos: [
+        { id: 'tradicional', title: 'Traditional', desc: 'Genesis → Revelation (standard)' },
+        { id: 'cronologico', title: 'Chronological', desc: 'Approx. historical order' },
+        { id: 'atnt', title: 'OT + NT', desc: 'OT + NT passage per day' },
+        { id: 'jesus', title: 'One Year with Jesus', desc: 'Gospels → Acts → Letters → Rest' },
+        { id: 'umcap', title: '1 Chapter/Day', desc: '1 chapter per day (365 picks)' },
+        { id: 'salmos', title: 'OT+NT+Psalms', desc: 'OT + NT + Psalm/Proverb daily' }
+      ],
+      start: 'Reading Day',
+      marcar: '✔ Mark as read',
+      fechar: 'Close',
+      progresso: 'Progress',
+      plano: 'Plan',
+      dia_leitura: 'Day',
+      lang_name: 'English',
+      flag_code: 'us' // Código do Flag Icon CSS para os EUA
+    },
+    es: {
+      titulo: 'Plan Bíblico — 1 Año',
+      subtitulo: 'Elige un plan y comienza hoy',
+      ler_agora: 'Leer ahora',
+      planos: [
+        { id: 'tradicional', title: 'Tradicional', desc: 'Génesis → Apocalipsis (estándar)' },
+        { id: 'cronologico', title: 'Cronológico', desc: 'Orden histórico aproximado' },
+        { id: 'atnt', title: 'AT + NT', desc: 'Pasaje de AT y NT por día' },
+        { id: 'jesus', title: 'Un Año con Jesús', desc: 'Evangelios → Hechos → Cartas → Resto' },
+        { id: 'umcap', title: '1 Capítulo/Día', desc: '1 capítulo por día (365 selecciones)' },
+        { id: 'salmos', title: 'AT+NT+Salmos', desc: 'AT + NT + Salmo/Proverbio diario' }
+      ],
+      start: 'Día de Lectura',
+      marcar: '✔ Marcar como leído',
+      fechar: 'Cerrar',
+      progresso: 'Progreso',
+      plano: 'Plan',
+      dia_leitura: 'Day',
+      lang_name: 'Español',
+      flag_code: 'es' // Código do Flag Icon CSS para a Espanha
+    }
+  };
+  
+  // O restante das constantes (MONTHS, DAYS_PER_MONTH, BOOKS, etc.) é mantido...
+  const MONTHS = {
+    pt: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
+    en: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    es: ["Ene","Feb","Mar","Abr","Mai","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+  };
+  const DAYS_PER_MONTH = [31,28,31,30,31,30,31,31,30,31,30,31];
+  const BOOKS = [
+    { key:'Genesis', ch:50, name:{pt:'Gênesis', en:'Genesis', es:'Génesis'} },
+    { key:'Exodus', ch:40, name:{pt:'Êxodo', en:'Exodus', es:'Éxodo'} },
+    { key:'Leviticus', ch:27, name:{pt:'Levítico', en:'Leviticus', es:'Levítico'} },
+    { key:'Numbers', ch:36, name:{pt:'Números', en:'Numbers', es:'Números'} },
+    { key:'Deuteronomy', ch:34, name:{pt:'Deuteronômio', en:'Deuteronomy', es:'Deuteronomio'} },
+    { key:'Joshua', ch:24, name:{pt:'Josué', en:'Joshua', es:'Josué'} },
+    { key:'Judges', ch:21, name:{pt:'Juízes', en:'Judges', es:'Jueces'} },
+    { key:'Ruth', ch:4, name:{pt:'Rute', en:'Ruth', es:'Rut'} },
+    { key:'1 Samuel', ch:31, name:{pt:'1 Samuel', en:'1 Samuel', es:'1 Samuel'} },
+    { key:'2 Samuel', ch:24, name:{pt:'2 Samuel', en:'2 Samuel', es:'2 Samuel'} },
+    { key:'1 Kings', ch:22, name:{pt:'1 Reis', en:'1 Kings', es:'1 Reyes'} },
+    { key:'2 Kings', ch:25, name:{pt:'2 Reis', en:'2 Kings', es:'2 Reyes'} },
+    { key:'1 Chronicles', ch:29, name:{pt:'1 Crônicas', en:'1 Chronicles', es:'1 Crónicas'} },
+    { key:'2 Chronicles', ch:36, name:{pt:'2 Crônicas', en:'2 Chronicles', es:'2 Crónicas'} },
+    { key:'Ezra', ch:10, name:{pt:'Esdras', en:'Ezra', es:'Esdras'} },
+    { key:'Nehemiah', ch:13, name:{pt:'Neemias', en:'Nehemiah', es:'Nehemías'} },
+    { key:'Esther', ch:10, name:{pt:'Ester', en:'Esther', es:'Ester'} },
+    { key:'Job', ch:42, name:{pt:'Jó', en:'Job', es:'Job'} },
+    { key:'Psalms', ch:150, name:{pt:'Salmos', en:'Psalms', es:'Salmos'} },
+    { key:'Proverbs', ch:31, name:{pt:'Provérbios', en:'Proverbs', es:'Proverbios'} },
+    { key:'Ecclesiastes', ch:12, name:{pt:'Eclesiastes', en:'Ecclesiastes', es:'Eclesiastés'} },
+    { key:'Song of Solomon', ch:8, name:{pt:'Cânticos', en:'Song of Solomon', es:'Cantar de los Cantares'} },
+    { key:'Isaiah', ch:66, name:{pt:'Isaías', en:'Isaiah', es:'Isaías'} },
+    { key:'Jeremiah', ch:52, name:{pt:'Jeremias', en:'Jeremiah', es:'Jeremías'} },
+    { key:'Lamentations', ch:5, name:{pt:'Lamentações', en:'Lamentations', es:'Lamentaciones'} },
+    { key:'Ezekiel', ch:48, name:{pt:'Ezequiel', en:'Ezekiel', es:'Ezequiel'} },
+    { key:'Daniel', ch:12, name:{pt:'Daniel', en:'Daniel', es:'Daniel'} },
+    { key:'Hosea', ch:14, name:{pt:'Oséias', en:'Hosea', es:'Oseas'} },
+    { key:'Joel', ch:3, name:{pt:'Joel', en:'Joel', es:'Joel'} },
+    { key:'Amos', ch:9, name:{pt:'Amós', en:'Amos', es:'Amós'} },
+    { key:'Obadiah', ch:1, name:{pt:'Obadias', en:'Obadiah', es:'Abdías'} },
+    { key:'Jonah', ch:4, name:{pt:'Jonas', en:'Jonah', es:'Jonás'} },
+    { key:'Micah', ch:7, name:{pt:'Miquéias', en:'Micah', es:'Miqueas'} },
+    { key:'Nahum', ch:3, name:{pt:'Naum', en:'Nahum', es:'Nahúm'} },
+    { key:'Habakkuk', ch:3, name:{pt:'Habacuque', en:'Habakkuk', es:'Habacuc'} },
+    { key:'Zephaniah', ch:3, name:{pt:'Sofonias', en:'Zephaniah', es:'Sofonías'} },
+    { key:'Haggai', ch:2, name:{pt:'Ageu', en:'Haggai', es:'Ageo'} },
+    { key:'Zechariah', ch:14, name:{pt:'Zacarias', en:'Zechariah', es:'Zacarías'} },
+    { key:'Malachi', ch:4, name:{pt:'Malaquias', en:'Malachi', es:'Malaquías'} },
+    { key:'Matthew', ch:28, name:{pt:'Mateus', en:'Matthew', es:'Mateo'} },
+    { key:'Mark', ch:16, name:{pt:'Marcos', en:'Mark', es:'Marcos'} },
+    { key:'Luke', ch:24, name:{pt:'Lucas', en:'Luke', es:'Lucas'} },
+    { key:'John', ch:21, name:{pt:'João', en:'John', es:'Juan'} },
+    { key:'Acts', ch:28, name:{pt:'Atos', en:'Acts', es:'Hechos'} },
+    { key:'Romans', ch:16, name:{pt:'Romanos', en:'Romans', es:'Romanos'} },
+    { key:'1 Corinthians', ch:16, name:{pt:'1 Coríntios', en:'1 Corinthians', es:'1 Corintios'} },
+    { key:'2 Corinthians', ch:13, name:{pt:'2 Coríntios', en:'2 Corinthians', es:'2 Corintios'} },
+    { key:'Galatians', ch:6, name:{pt:'Gálatas', en:'Galatians', es:'Gálatas'} },
+    { key:'Ephesians', ch:6, name:{pt:'Efésios', en:'Ephesians', es:'Efesios'} },
+    { key:'Philippians', ch:4, name:{pt:'Filipenses', en:'Philippians', es:'Filipenses'} },
+    { key:'Colossians', ch:4, name:{pt:'Colossenses', en:'Colossians', es:'Colosenses'} },
+    { key:'1 Thessalonians', ch:5, name:{pt:'1 Tessalonicenses', en:'1 Thessalonians', es:'1 Tesalonicenses'} },
+    { key:'2 Thessalonians', ch:3, name:{pt:'2 Tessalonicenses', en:'2 Thessalonians', es:'2 Tesalonicenses'} },
+    { key:'1 Timothy', ch:6, name:{pt:'1 Timóteo', en:'1 Timothy', es:'1 Timoteo'} },
+    { key:'2 Timothy', ch:4, name:{pt:'2 Timóteo', en:'2 Timothy', es:'2 Timoteo'} },
+    { key:'Titus', ch:3, name:{pt:'Tito', en:'Titus', es:'Tito'} },
+    { key:'Philemon', ch:1, name:{pt:'Filemom', en:'Philemon', es:'Filemón'} },
+    { key:'Hebrews', ch:13, name:{pt:'Hebreus', en:'Hebrews', es:'Hebreos'} },
+    { key:'James', ch:5, name:{pt:'Tiago', en:'James', es:'Santiago'} },
+    { key:'1 Peter', ch:5, name:{pt:'1 Pedro', en:'1 Peter', es:'1 Pedro'} },
+    { key:'2 Peter', ch:3, name:{pt:'2 Pedro', en:'2 Peter', es:'2 Pedro'} },
+    { key:'1 John', ch:5, name:{pt:'1 João', en:'1 John', es:'1 Juan'} },
+    { key:'2 John', ch:1, name:{pt:'2 João', en:'2 John', es:'2 Juan'} },
+    { key:'3 John', ch:1, name:{pt:'3 João', en:'3 John', es:'3 Juan'} },
+    { key:'Jude', ch:1, name:{pt:'Judas', en:'Jude', es:'Judas'} },
+    { key:'Revelation', ch:22, name:{pt:'Apocalipse', en:'Revelation', es:'Apocalipsis'} }
+  ];
+  const FLAT = [];
+  (function buildFlat(){
+    for(const b of BOOKS){
+      for(let c=1;c<=b.ch;c++) FLAT.push({ bookKey: b.key, chapter: c });
+    }
+  })();
+  function bookName(bookKey, lang){
+    const b = BOOKS.find(x=>x.key===bookKey);
+    return b ? (b.name[lang] || b.name.pt) : bookKey;
+  }
+  function formatRefObj(obj, lang){
+    return `${bookName(obj.bookKey, lang)} ${obj.chapter}`;
+  }
+  const CHRON_ORDER_KEYS = [ 
+    'Genesis','Job','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth',
+    '1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther',
+    'Isaiah','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Zechariah','Haggai','Malachi',
+    'Psalms','Proverbs','Ecclesiastes','Song of Solomon',
+    'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation','Daniel','Jeremiah','Lamentations','Ezekiel'
+  ];
+  function genTradicional(lang){
+    const total = FLAT.length; const perDay = total / 365; const plan = Array.from({length:365}, ()=>[]); let idx=0;
+    for(let day=0; day<365; day++){
+      const take = Math.max(1, Math.round(perDay));
+      for(let t=0; t<take && idx<total; t++, idx++) plan[day].push(formatRefObj(FLAT[idx], lang));
+    }
+    while(idx<total) plan[plan.length-1].push(formatRefObj(FLAT[idx++], lang));
+    return plan;
+  }
+  function genCronologico(lang){
+    const arr = [];
+    for(const k of CHRON_ORDER_KEYS){
+      const book = BOOKS.find(b=>b.key===k);
+      if(!book) continue;
+      for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter: c});
+    }
+    for(const b of BOOKS) if(!CHRON_ORDER_KEYS.includes(b.key)) for(let c=1;c<=b.ch;c++) arr.push({bookKey: b.key, chapter: c});
+    const total = arr.length; const perDay = total/365; const plan = Array.from({length:365},()=>[]); let idx=0;
+    for(let d=0; d<365; d++){
+      const take = Math.max(1, Math.round(perDay));
+      for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(arr[idx], lang));
+    }
+    while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++] , lang));
+    return plan;
+  }
+  function genATNT(lang){
+    const mattIndex = FLAT.findIndex(c=>c.bookKey==='Matthew');
+    const ot = FLAT.slice(0, mattIndex); const nt = FLAT.slice(mattIndex);
+    const otPer = ot.length/365; const ntPer = nt.length/365;
+    const plan = Array.from({length:365},()=>[]); let i=0,j=0;
+    for(let d=0; d<365; d++){
+      const takeOT = Math.max(1, Math.round(otPer)); const takeNT = Math.max(1, Math.round(ntPer));
+      for(let t=0;t<takeOT && i<ot.length;t++,i++) plan[d].push(formatRefObj(ot[i], lang));
+      for(let t=0;t<takeNT && j<nt.length;t++,j++) plan[d].push(formatRefObj(nt[j], lang));
+    }
+    while(i<ot.length) plan[plan.length-1].push(formatRefObj(ot[i++], lang));
+    while(j<nt.length) plan[plan.length-1].push(formatRefObj(nt[j++], lang));
+    return plan;
+  }
+  function genJesusYear(lang){
+    const order = ['Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','3 John','Jude','Revelation'];
+    const arr = [];
+    for(const name of order){
+      const book = BOOKS.find(b=>b.key===name);
+      if(!book) continue;
+      for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter:c});
+    }
+    for(const b of BOOKS) if(!order.includes(b.key)) for(let c=1;c<=b.ch;c++) arr.push({bookKey: b.key, chapter:c});
+    const total = arr.length; const perDay = total/365; const plan = Array.from({length:365},()=>[]); let idx=0;
+    for(let d=0; d<365; d++){
+      const take = Math.max(1, Math.round(perDay));
+      for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(arr[idx], lang));
+    }
+    while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++]));
+    return plan;
+  }
+  function genUmCapitulo(lang){
+    const plan = Array.from({length:365},()=>[]);
+    for(let i=0;i<365;i++){
+      if(i<FLAT.length) plan[i].push(formatRefObj(FLAT[i], lang)); else plan[i].push('—');
+    }
+    return plan;
+  }
+  function genComSalmos(lang){
+    const mattIndex = FLAT.findIndex(c=>c.bookKey==='Matthew');
+    const ot = FLAT.slice(0, mattIndex); const nt = FLAT.slice(mattIndex);
+    const psStart = FLAT.findIndex(c=>c.bookKey==='Psalms'); const provStart = FLAT.findIndex(c=>c.bookKey==='Proverbs');
+    const psCount = BOOKS.find(b=>b.key==='Psalms').ch; const provCount = BOOKS.find(b=>b.key==='Proverbs').ch;
+    const otPer = ot.length/365; const ntPer = nt.length/365;
+    const plan = Array.from({length:365},()=>[]); let i=0,j=0,p=psStart,pr=provStart,alt=true;
+    for(let d=0; d<365; d++){
+      const takeOT = Math.max(1, Math.round(otPer)); const takeNT = Math.max(1, Math.round(ntPer));
+      for(let t=0;t<takeOT && i<ot.length;t++,i++) plan[d].push(formatRefObj(ot[i], lang));
+      for(let t=0;t<takeNT && j<nt.length;t++,j++) plan[d].push(formatRefObj(nt[j], lang));
+      if(alt && p < psStart + psCount) plan[d].push(formatRefObj(FLAT[p++], lang));
+      else if(!alt && pr < provStart + provCount) plan[d].push(formatRefObj(FLAT[pr++], lang));
+      else if(p < psStart + psCount) plan[d].push(formatRefObj(FLAT[p++], lang));
+      else if(pr < provStart + provCount) plan[d].push(formatRefObj(FLAT[pr++], lang));
+      alt = !alt;
+    }
+    while(i<ot.length) plan[plan.length-1].push(formatRefObj(ot[i++] , lang));
+    while(j<nt.length) plan[plan.length-1].push(formatRefObj(nt[j++] , lang));
+    return plan;
+  }
+
+  const PLAN_GENERATORS = { tradicional: genTradicional, cronologico: genCronologico, atnt: genATNT, jesus: genJesusYear, umcap: genUmCapitulo, salmos: genComSalmos };
+  const CACHE = {};
+  function getPlan(id, lang){
+    const key = `${id}__${lang}`;
+    if(!CACHE[key]) CACHE[key] = PLAN_GENERATORS[id](lang);
+    return CACHE[key];
+  }
+
+  // ---------- UI & STATE ----------
+  let state = {
+    idioma: localStorage.getItem('bib_idioma') || 'pt',
+    planoId: localStorage.getItem('bib_plano') || 'tradicional',
+    selectedMonth: 1,
+    selectedDayOfMonth: null,
+  };
+
+  function dayOfYearToMonthDay(n){
+    let m=0; let day = n;
+    while(m<12 && day > DAYS_PER_MONTH[m]){ day -= DAYS_PER_MONTH[m]; m++; }
+    return { month: m+1, day: day };
+  }
+  function monthDayToDayOfYear(month, day){
+    let s=0; for(let i=0;i<month-1;i++) s+=DAYS_PER_MONTH[i]; return s+day;
+  }
+
+  // ---------- RENDER FUNCTIONS (Lógicas de UI) ----------
+  function renderPlanGrid(){
+    const container = document.getElementById('gridPlanos'); container.innerHTML='';
+    const texts = UI_TEXT[state.idioma].planos;
+    const icons = ['calendar','clock','layers','heart','book-open','sun'];
+    texts.forEach((p, idx)=>{
+      const btn = document.createElement('button');
+      btn.type='button';
+      const isSelected = state.planoId===p.id;
+      btn.className='plan-button flex flex-col items-center p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' +
+                    (isSelected ? 'bg-primary-500 text-white ring-4 ring-primary-500/50 hover:bg-primary-600' : 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500');
+      btn.style.minHeight='120px';
+      const iconColor = isSelected ? 'text-white' : 'text-primary-500';
+      const descColor = isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400';
+      const iconName = icons[idx] || 'book';
+      btn.innerHTML = `\
+        <div class="mb-2"><i data-lucide="${iconName}" class="lucide w-8 h-8 ${iconColor}"></i></div>\
+        <div class="text-base font-bold">${p.title}</div>\
+        <div class="text-xs ${descColor} mt-1">${p.desc}</div>`;
+      btn.onclick = ()=>{
+        state.planoId = p.id; localStorage.setItem('bib_plano', p.id);
+        renderPlanGrid(); renderMonths(); renderDays(state.selectedMonth); updateProgressUI();
+      };
+      container.appendChild(btn);
+    });
+    // Chamada Lucide (necessária apenas para os ícones do corpo do app, não interfere no botão de tema)
+    if(window.lucide) window.lucide.createIcons();
+  }
+
+  function renderMonths(){
+    const div = document.getElementById('meses'); div.innerHTML='';
+    const months = MONTHS[state.idioma];
+    months.forEach((m,i)=>{
+      const isSelected = state.selectedMonth === i+1;
+      const btn = document.createElement('button');
+      btn.className = 'flex-shrink-0 px-4 py-2 rounded-full font-semibold transition ' + 
+                      (isSelected ? 'bg-primary-500 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600');
+      btn.innerText = m;
+      btn.onclick = ()=>{ state.selectedMonth = i+1; renderMonths(); renderDays(i+1); };
+      div.appendChild(btn);
+    });
+    
+    const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
+    if(currentMonthButton){
+        currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function renderDays(month){
+    const container = document.getElementById('dias'); container.innerHTML='';
+    const daysInMonth = DAYS_PER_MONTH[month-1];
+    const startDayOfYear = monthDayToDayOfYear(month,1);
+    const plan = getPlan(state.planoId, state.idioma);
+    for(let d=1; d<=daysInMonth; d++){
+      const dayOfYear = startDayOfYear + d -1; const idx = dayOfYear -1; const refs = plan[idx] || [];
+      const key = `${state.planoId}_day_${dayOfYear}`; const lido = localStorage.getItem(key);
+      const card = document.createElement('div');
+      
+      card.className = 'p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border-t-2 ' +
+                       (lido ? 'border-primary-500 opacity-90' : 'border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500') +
+                       ' cursor-pointer transition';
+      
+      const preview = refs.slice(0,2).join(', ');
+      const iconName = lido ? 'check-circle' : 'chevrons-right';
+      const iconColor = lido ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500';
+
+      card.innerHTML = `\
+        <div class="flex justify-between items-start">\
+          <div>\
+            <h3 class="text-xl font-extrabold text-primary-500">${d}</h3>\
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
+          </div>\
+          <div class="${iconColor} flex-shrink-0"><i data-lucide="${iconName}" class="lucide w-6 h-6"></i></div>\
+        </div>\
+        <p class="mt-3 text-sm font-medium text-gray-700 dark:text-gray-200">${preview}${refs.length>2? ' ...' : ''}</p>`;
+      card.onclick = ()=> abrirModalForDay(dayOfYear);
+      container.appendChild(card);
+    }
+    // Chamada Lucide (necessária apenas para os ícones do corpo do app)
+    if(window.lucide) window.lucide.createIcons(); updateProgressUI();
+  }
+
+  function formatDateSmall(month, day){ const months = MONTHS[state.idioma]; return `${months[month-1]} ${day}`; }
+
+  let modalCurrentDay = null;
+  const modalDiv = document.getElementById('modal');
+  const modalContent = document.getElementById('modalContent');
+
+  function abrirModalForDay(dayOfYear){
+    modalCurrentDay = dayOfYear;
+    const plan = getPlan(state.planoId, state.idioma);
+    const refs = plan[dayOfYear-1] || [];
+    document.getElementById('modalTitulo').innerText = `${UI_TEXT[state.idioma].start} • ${UI_TEXT[state.idioma].dia_leitura} ${dayOfYear}`;
+    const ul = document.getElementById('modalLeituras'); ul.innerHTML = '';
+    
+    refs.forEach(r=>{
+      const li = document.createElement('li'); li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
+      const icon = document.createElement('i'); icon.setAttribute('data-lucide', 'book-open'); icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
+      const span = document.createElement('span'); span.innerText = r;
+      li.appendChild(icon);
+      li.appendChild(span);
+      ul.appendChild(li);
+    });
+    
+    document.getElementById('btnLido').innerText = UI_TEXT[state.idioma].marcar;
+    document.getElementById('btnLerAgora').innerText = `📖 ${UI_TEXT[state.idioma].ler_agora}`;
+    
+    modalDiv.classList.remove('hidden');
+    setTimeout(()=>{
+      modalDiv.style.opacity = '1';
+      modalContent.classList.remove('scale-95');
+    }, 10); 
+
+    if(window.lucide) window.lucide.createIcons();
+  }
+
+  function fecharModal(){
+    modalDiv.style.opacity = '0';
+    modalContent.classList.add('scale-95');
+    setTimeout(()=> modalDiv.classList.add('hidden'), 300); 
+  }
+
+  document.getElementById('fecharModal').addEventListener('click', fecharModal);
+  
+  document.getElementById('btnLido').addEventListener('click', ()=>{
+    if(!modalCurrentDay) return; 
+    const key = `${state.planoId}_day_${modalCurrentDay}`; 
+    localStorage.setItem(key,'1'); 
+    fecharModal(); 
+    renderDays(state.selectedMonth); 
+    updateProgressUI();
+  });
+
+  document.getElementById('btnLerAgora').addEventListener('click', ()=>{
+    if(!modalCurrentDay) return; const plan = getPlan(state.planoId, state.idioma); const refs = plan[modalCurrentDay-1] || [];
+    if(refs.length===0) return;
+    const joinForSearch = refs.map(r=> r.replace(/\s+/g,' ')).join(',');
+    const version = state.idioma==='pt' ? 'NVI-PT' : state.idioma==='en' ? 'NIV' : 'NIV';
+    const url = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(joinForSearch)}&version=${version}`;
+    window.open(url, '_blank');
+  });
+  
+  document.getElementById('modal').addEventListener('click',(e)=>{ if(e.target.id==='modal') fecharModal(); });
+
+  function updateProgressUI(){
+    const plan = getPlan(state.planoId, state.idioma);
+    const total = plan.length; let read=0;
+    for(let i=0;i<total;i++){ if(localStorage.getItem(`${state.planoId}_day_${i+1}`)) read++; }
+    const pct = Math.round((read/total)*100);
+    document.getElementById('progressoBar').style.width = pct + '%';
+    document.getElementById('textoProgresso').innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}`;
+    const planoEncontrado = UI_TEXT[state.idioma].planos.find(p=>p.id===state.planoId);
+    const planName = planoEncontrado ? planoEncontrado.title : '---';
+    document.getElementById('textoPlanoAtual').innerText = `${UI_TEXT[state.idioma].plano}: ${planName}`;
+  }
+
+  // ---------- IDIOMA DROPDOWN LOGIC ----------
+  const idiomaToggle = document.getElementById('idiomaToggle');
+  const idiomaMenu = document.getElementById('idiomaMenu');
+  const currentFlag = document.getElementById('currentFlag');
+  const currentLangText = document.getElementById('currentLangText');
+  const idiomaItems = document.querySelectorAll('.idioma-item');
+
+  function updateIdiomaDisplay(lang){
+    const texts = UI_TEXT[lang];
+    const flagCode = texts.flag_code;
+
+    // Atualiza o botão principal
+    currentFlag.className = `flag-icon flag-icon-${flagCode}`;
+    currentLangText.innerText = texts.lang_name;
+    
+    // Altera o estado de 'selecionado' no menu
+    idiomaItems.forEach(item => {
+        if(item.getAttribute('data-lang') === lang) {
+            item.classList.add('bg-gray-200', 'dark:bg-gray-600');
+        } else {
+            item.classList.remove('bg-gray-200', 'dark:bg-gray-600');
+        }
+    });
+
+    updateUITexts(lang);
+  }
+  
+  function toggleIdiomaMenu(){
+      const isHidden = idiomaMenu.classList.contains('hidden');
+      if (isHidden) {
+          idiomaMenu.classList.remove('hidden');
+          setTimeout(() => {
+              idiomaMenu.classList.remove('scale-95', 'opacity-0');
+          }, 10);
+      } else {
+          idiomaMenu.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+              idiomaMenu.classList.add('hidden');
+          }, 150);
+      }
+  }
+
+  idiomaToggle.addEventListener('click', toggleIdiomaMenu);
+  document.addEventListener('click', (e) => {
+      const idiomaDropdown = document.getElementById('idiomaDropdown');
+      const isClickInside = idiomaDropdown.contains(e.target);
+      if (!isClickInside && !idiomaMenu.classList.contains('hidden')) {
+          toggleIdiomaMenu();
+      }
+  });
+
+
+  idiomaItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+          const newLang = item.getAttribute('data-lang');
+          if (newLang !== state.idioma) {
+              state.idioma = newLang; 
+              localStorage.setItem('bib_idioma', state.idioma);
+              updateIdiomaDisplay(state.idioma);
+          }
+          toggleIdiomaMenu();
+      });
+  });
+
+  // Função centralizada de atualização de texto
+  function updateUITexts(lang){
+    const texts = UI_TEXT[lang];
+    document.getElementById('tituloApp').innerText = texts.titulo;
+    document.getElementById('subtituloApp').innerText = texts.subtitulo;
+    
+    renderPlanGrid(); 
+    renderMonths(); 
+    renderDays(state.selectedMonth); 
+    updateProgressUI();
+  }
+
+
+  // ---------- INITIALIZE APP ----------
+  function init(){
+    const today = new Date(); 
+    state.selectedMonth = state.selectedMonth || (today.getMonth()+1);
+    
+    // Inicializa o display do idioma, que por sua vez chama updateUITexts
+    updateIdiomaDisplay(state.idioma);
+  }
+  init();
+
+  </script>
+    
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnTema = document.getElementById('btnTema');
+    // ID para o texto dentro do botão de tema
+    const themeStatusText = document.getElementById('themeStatusText'); 
+    const root = document.documentElement;
+
+    /**
+     * Aplica o tema (claro/escuro) e atualiza o texto/emoji.
+     * @param {boolean} isDark - Se o tema a ser aplicado é o escuro.
+     */
+    function applyTheme(isDark) {
+        root.classList.toggle('dark', !!isDark);
+        
+        // Persiste a escolha no localStorage
+        if (isDark) {
+            localStorage.setItem('bib_theme', 'dark');
+            // Quando está no modo ESCURO, o botão deve mostrar "CLARO 🌞" para o próximo clique
+            if (themeStatusText) themeStatusText.innerText = 'Claro 🌞'; 
+        } else {
+            localStorage.removeItem('bib_theme');
+            // Quando está no modo CLARO, o botão deve mostrar "ESCURO 🌙" para o próximo clique
+            if (themeStatusText) themeStatusText.innerText = 'Escuro 🌙';
+        }
+    }
+
+    function toggleTheme() {
+        const nowDark = root.classList.contains('dark');
+        applyTheme(!nowDark);
+    }
+
+    // 1. Inicializa o tema na carga
+    const storedDark = localStorage.getItem('bib_theme') === 'dark';
+    applyTheme(storedDark);
+
+    // 2. Adiciona listener
+    if (btnTema) {
+        btnTema.addEventListener('click', toggleTheme);
+    }
+  });
+  </script>
+
+</body>
+</html>
