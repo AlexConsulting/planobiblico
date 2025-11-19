@@ -27,6 +27,11 @@
             'primary': {
               500: '#4f46e5', // Indigo padrão
               600: '#4338ca', // Indigo mais escuro para hover
+            },
+            // NOVO: Cor para o destaque META
+            'meta': {
+                500: '#10b981', // Emerald
+                600: '#059669',
             }
           }
         }
@@ -36,27 +41,39 @@
 
   <style>
     /* pequeno polimento */
-    .plan-button:active, #idiomaToggle:active, #btnTema:active { transform: scale(.995); }
+    .plan-button:active, #idiomaToggle:active, #btnTema:active, #btnMeta:active { transform: scale(.995); }
     /* transição suave para a barra de progresso */
     #progressoBar { transition: width 350ms ease; }
     
-    /* NOVO: Estilo para o destaque ao clicar no botão "Hoje" (Contorno) */
-    #btnHoje:active { 
-        transform: scale(.995); 
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5); /* Contorno suave */
+    /* Estilo para o destaque META (Contorno) */
+    #btnMeta:active { 
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5); /* Contorno suave Esmeralda */
     }
 
-    /* NOVO: Destaque visual para o dia atual no grid de leitura */
+    /* Destaque visual para o dia atual no grid de leitura */
     .today-highlight {
-        border: 2px solid #4f46e5 !important; /* Cor primária */
-        background-color: #eef2ff !important; /* Indigo-50 claro */
+        border: 2px dashed #3b82f6 !important; /* Cor azul suave */
+        background-color: #eff6ff !important; /* Azul-50 claro */
         transform: scale(1.01);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
     }
     .dark .today-highlight {
         --tw-bg-opacity: 1; 
         background-color: rgb(30 41 59 / var(--tw-bg-opacity)) !important; /* slate-800 */
-        border-color: #6366f1 !important; /* Indigo-500 light */
+        border-color: #60a5fa !important; /* Blue-400 light */
+    }
+
+    /* Destaque visual para o dia META (Próximo Dia Pendente) */
+    .next-day-highlight {
+        border: 3px solid #10b981 !important; /* Esmeralda para "Meta" */
+        background-color: #f0fdf4 !important; /* Esmeralda-50 claro */
+        transform: scale(1.02);
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    }
+    .dark .next-day-highlight {
+        --tw-bg-opacity: 1; 
+        background-color: rgb(6 78 59 / var(--tw-bg-opacity)) !important; /* Emerald-900 */
+        border-color: #34d399 !important; /* Emerald-400 light */
     }
   </style>
 </head>
@@ -91,12 +108,13 @@
             </div>
         </div>
         
-        <button id="btnHoje" class="p-2 px-3 rounded-xl bg-gray-200 dark:bg-gray-700 hover:scale-105 transition flex items-center justify-center font-semibold text-sm" aria-label="Voltar para o dia de hoje">
-          📅 <span id="btnHojeText" class="ml-1 hidden sm:inline">HOJE</span>
+        <button id="btnMeta" class="p-2 px-3 rounded-xl bg-meta-500 text-white hover:bg-meta-600 transition flex items-center justify-center font-semibold text-sm shadow-md shadow-meta-500/30" aria-label="Ir para a meta de leitura">
+          📅 <span id="btnMetaText" class="ml-1 hidden sm:inline">META</span>
         </button>
 
         <button id="btnTema" class="p-2 px-3 rounded-xl bg-gray-200 dark:bg-gray-700 hover:scale-105 transition flex items-center justify-center font-semibold text-sm" aria-label="Alternar tema">
-          <span id="themeStatusText">🌙</span> </button>
+          <span id="themeStatusText">🌙</span>
+        </button>
       </div>
     </div>
   </header>
@@ -104,8 +122,8 @@
   <main class="p-4 sm:p-6 flex-1 overflow-auto">
     
     <section id="paginaSelecao" class="pagina max-w-7xl mx-auto w-full">
-      <h2 class="mt-8 mb-4 text-center text-xl font-bold text-gray-700 dark:text-gray-300">Escolha seu Plano de Leitura</h2>
-      <p class="text-center text-gray-500 dark:text-gray-400 mb-8">Seu plano será salvo automaticamente.</p>
+      <h2 id="tituloSelecao" class="mt-8 mb-4 text-center text-xl font-bold text-gray-700 dark:text-gray-300">Escolha seu Plano de Leitura</h2>
+      <p id="subtituloSelecao" class="text-center text-gray-500 dark:text-gray-400 mb-8">Seu plano será salvo automaticamente.</p>
       
       <div id="gridPlanos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mx-auto mt-4">
         </div>
@@ -124,6 +142,15 @@
         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3.5 overflow-hidden">
           <div id="progressoBar" class="bg-primary-500 h-3.5 rounded-full" style="width:0%"></div>
         </div>
+        
+        <div class="mt-4 flex items-center justify-between px-1 border-b pb-3 border-gray-200 dark:border-gray-700">
+            <button id="btnConfiguracao" class="text-sm text-gray-500 dark:text-gray-400 font-medium hover:text-primary-500 transition flex items-center">
+                <i data-lucide="settings" class="lucide w-4 h-4 mr-1"></i>
+                <span id="textoConfiguracao">Configurações do Plano</span>
+            </button>
+            <span id="textoDataInicio" class="text-sm text-right text-gray-500 dark:text-gray-400">Início: Não definido</span>
+        </div>
+
       </div>
       
       <div class="mt-8">
@@ -140,23 +167,40 @@
   <div id="modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
     <div id="modalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-md shadow-2xl scale-95 transition-transform duration-300">
       <div class="flex justify-between items-start">
-        <h3 id="modalTitulo" class="text-2xl font-extrabold text-primary-500"></h3>
+        <div class="flex flex-col">
+          <h3 id="modalTitulo" class="text-2xl font-extrabold text-primary-500"></h3>
+          <p id="modalStatus" class="mt-1 text-sm text-red-600 dark:text-red-400 italic font-semibold hidden"></p> 
+        </div>
         <button id="fecharModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
           <i data-lucide="x" class="lucide w-6 h-6"></i>
         </button>
       </div>
 
-      <ul id="modalLeituras" class="mt-4 space-y-2 text-gray-700 dark:text-gray-200 border-t pt-4 border-gray-200 dark:border-gray-700"></ul>
-
-      <div class="mt-6 flex gap-3">
+      <div id="modalCustomContent" class="mt-4 space-y-4 text-gray-700 dark:text-gray-200 border-t pt-4 border-gray-200 dark:border-gray-700">
+        <ul id="modalLeituras" class="space-y-2"></ul>
+        <div id="modalConfiguracao" class="hidden">
+            <p id="modalMsg"></p>
+            <input type="date" id="inputDataInicio" class="w-full mt-2 p-2 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-center font-semibold hidden"/>
+            <div class="mt-4 space-y-2">
+                <button id="btnAcaoSecundaria" class="w-full px-4 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition shadow-lg shadow-red-600/30">Apagar Tudo (Reset)</button>
+            </div>
+        </div>
+      </div>
+      
+      <div id="modalBotoes" class="mt-6 flex gap-3">
         <button id="btnLido" class="flex-1 px-4 py-3 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition shadow-lg shadow-primary-500/30">✔ Marcar como lido</button>
         <button id="btnLerAgora" class="px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">📖 Ler agora</button>
+        <button id="btnConfirmar" class="flex-1 px-4 py-3 rounded-xl bg-meta-500 text-white font-semibold hover:bg-meta-600 transition shadow-lg shadow-meta-500/30 hidden">Confirmar</button>
+        <button id="btnCancelar" class="px-4 py-3 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition hidden">Cancelar</button>
       </div>
     </div>
   </div>
 
   <footer class="mt-12 py-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-600 dark:text-gray-400">
     © 2025 Alex Silva — <em>Uso livre com atribuição</em>
+    <p class="text-xs mt-1">
+        <a href="https://www.instagram.com/alexsilva_prof" target="_blank" class="text-primary-500 hover:underline">@alexsilva_prof</a>
+    </p>
   </footer>
 
   <script>
@@ -166,10 +210,10 @@
     pt: {
       titulo: 'Plano Bíblico',
       subtitulo: 'Acompanhe seu progresso',
-      titulo_selecao: 'Plano Bíblico',
+      // NOVO: Textos traduzíveis da página de seleção
+      titulo_selecao: 'Escolha seu Plano de Leitura',
       subtitulo_selecao: 'Seu plano será salvo automaticamente.',
       link_trocar: 'Trocar Plano',
-      // ... (outros textos)
       ler_agora: 'Ler agora',
       planos: [
         { id: 'tradicional', title: 'Tradicional', desc: 'Gênesis → Apocalipse (padrão)' },
@@ -181,25 +225,41 @@
       ],
       start: 'Dia de Leitura',
       marcar: '✔ Marcar como lido',
+      desmarcar: '❌ Desmarcar como lido', // NOVO: Texto para desmarcar
+      concluido: 'Concluído', // NOVO: Texto para status
       fechar: 'Fechar',
       progresso: 'Progresso',
       plano: 'Plano',
       dia_leitura: 'Dia',
       lang_name: 'Português',
       flag_code: 'br',
-      hoje: 'HOJE', 
-      // NOVO: Textos para o Grid de Planos
-      plano_ativo: 'PLANO ATIVO',
-      continuar: 'Continuar',
-      iniciar: 'Iniciar' 
+      meta: 'META',
+      configuracao: 'Configurações do Plano',
+      data_inicio: 'Início',
+      btn_iniciar: 'Definir Data de Início', 
+      btn_iniciar_plano: 'Iniciar Plano', 
+      plano_atual: 'Plano Atual', 
+      btn_salvar: 'Salvar',
+      reset_plano: 'Apagar Tudo (Reset)',
+      reset_titulo: 'Confirma Limpeza?',
+      reset_msg: 'Isso apagará **TODO** o seu progresso e plano salvos. Deseja continuar?',
+      reset_confirmar: 'Sim, Apagar Tudo',
+      cancelar: 'Cancelar',
+      status_atraso: 'Você está **{dias} dias** atrasado.',
+      status_emdia: 'Você está **em dia!** Dia de hoje é o seu alvo.',
+      status_adiantado: 'Você está **{dias} dias** adiantado. Parabéns!',
+      nao_definido: 'Não definido',
+      change_plan_titulo: 'Trocar Plano?', 
+      change_plan_msg: 'Trocar de plano apagará todo o seu **progresso atual** e o **plano selecionado**. Deseja prosseguir?',
+      change_plan_confirmar: 'Sim, Trocar Plano',
     },
     en: {
         titulo: 'Bible Plan',
         subtitulo: 'Track your progress',
-        titulo_selecao: 'Bible Plan',
+        // NOVO: Textos traduzíveis da página de seleção
+        titulo_selecao: 'Choose Your Reading Plan',
         subtitulo_selecao: 'Your plan will be saved automatically.',
         link_trocar: 'Change Plan',
-        // ... (other texts)
         ler_agora: 'Read now',
         planos: [
           { id: 'tradicional', title: 'Traditional', desc: 'Genesis → Revelation (standard)' },
@@ -211,25 +271,41 @@
         ],
         start: 'Reading Day',
         marcar: '✔ Mark as read',
+        desmarcar: '❌ Mark as unread', // NOVO: Texto para desmarcar
+        concluido: 'Completed', // NOVO: Texto para status
         fechar: 'Close',
         progresso: 'Progress',
         plano: 'Plan',
         dia_leitura: 'Day',
         lang_name: 'English',
         flag_code: 'us',
-        hoje: 'TODAY', 
-        // NEW: Texts for Plan Grid
-        plano_ativo: 'ACTIVE PLAN',
-        continuar: 'Continue',
-        iniciar: 'Start'
+        meta: 'GOAL',
+        configuracao: 'Plan Settings',
+        data_inicio: 'Start Date',
+        btn_iniciar: 'Set Start Date',
+        btn_iniciar_plano: 'Start Plan', 
+        plano_atual: 'Current Plan', 
+        btn_salvar: 'Save',
+        reset_plano: 'Reset/Clear Plan',
+        reset_titulo: 'Confirm Reset?',
+        reset_msg: 'This will erase **ALL** your saved plan and progress. Do you wish to continue?',
+        reset_confirmar: 'Yes, Erase All',
+        cancelar: 'Cancel',
+        status_atraso: 'You are **{dias} days** behind.',
+        status_emdia: 'You are **on track!** Today is your goal.',
+        status_adiantado: 'You are **{dias} days** ahead. Congratulations!',
+        nao_definido: 'Not set',
+        change_plan_titulo: 'Change Plan?', 
+        change_plan_msg: 'Changing the plan will erase all your **current progress** and **selected plan**. Do you want to proceed?',
+        change_plan_confirmar: 'Yes, Change Plan',
     },
     es: {
         titulo: 'Plan Bíblico',
         subtitulo: 'Sigue tu progreso',
-        titulo_selecao: 'Plan Bíblico',
+        // NOVO: Textos traduzíveis da página de seleção
+        titulo_selecao: 'Elige tu Plan de Lectura',
         subtitulo_selecao: 'Tu plan se guardará automáticamente.',
         link_trocar: 'Cambiar Plan',
-        // ... (other texts)
         ler_agora: 'Leer ahora',
         planos: [
           { id: 'tradicional', title: 'Tradicional', desc: 'Génesis → Apocalipsis (estándar)' },
@@ -241,17 +317,33 @@
         ],
         start: 'Día de Lectura',
         marcar: '✔ Marcar como leído',
+        desmarcar: '❌ Desmarcar como leído', // NOVO: Texto para desmarcar
+        concluido: 'Completado', // NOVO: Texto para status
         fechar: 'Cerrar',
         progresso: 'Progreso',
         plano: 'Plan',
         dia_leitura: 'Day',
         lang_name: 'Español',
         flag_code: 'es',
-        hoje: 'HOY', 
-        // NUEVO: Textos para el Grid de Planes
-        plano_ativo: 'PLAN ACTIVO',
-        continuar: 'Continuar',
-        iniciar: 'Iniciar'
+        meta: 'META',
+        configuracion: 'Configuración del Plan',
+        data_inicio: 'Fecha de Inicio',
+        btn_iniciar: 'Establecer Fecha de Inicio',
+        btn_iniciar_plano: 'Iniciar Plan', 
+        plano_atual: 'Plan Actual', 
+        btn_salvar: 'Guardar',
+        reset_plano: 'Reiniciar/Borrar Plan',
+        reset_titulo: '¿Confirmar Borrado?',
+        reset_msg: 'Esto borrará **TODO** tu progreso y plan guardados. ¿Deseas continuar?',
+        reset_confirmar: 'Sí, Borrar Todo',
+        cancelar: 'Cancelar',
+        status_atraso: 'Estás **{dias} días** atrasado.',
+        status_emdia: 'Estás **al día!** El día de hoy es tu meta.',
+        status_adiantado: 'Estás **{dias} días** adelantado. ¡Felicidades!',
+        nao_definido: 'No definido',
+        change_plan_titulo: '¿Cambiar Plan?', 
+        change_plan_msg: 'Cambiar el plan borrará todo tu **progreso actual** y el **plan seleccionado**. ¿Quieres continuar?',
+        change_plan_confirmar: 'Sí, Cambiar Plan',
     }
   };
   
@@ -445,9 +537,11 @@
 
   // ---------- UI & STATE ----------
   let state = {
-    // Carrega o idioma e o plano do localStorage ou usa o padrão 'pt'/'tradicional'
+    // Carrega o idioma, plano e DATA DE INÍCIO do localStorage ou usa o padrão
     idioma: localStorage.getItem('bib_idioma') || 'pt',
-    planoId: localStorage.getItem('bib_plano') || null, // Começa como null para forçar a seleção se não houver
+    planoId: localStorage.getItem('bib_plano') || null, 
+    // Data de Início do plano (YYYY-MM-DD string)
+    startDate: localStorage.getItem('bib_startDate') || null, 
     selectedMonth: 1,
     selectedDayOfMonth: null,
   };
@@ -469,16 +563,50 @@
     let s=0; for(let i=0;i<month-1;i++) s+=DAYS_PER_MONTH[i]; return s+day;
   }
 
+  // Calcula o número de dias decorridos desde a data de início
+  function getDaysSinceStart() {
+    if (!state.startDate) return 0;
+    // IMPORTANTE: Adiciona 'T00:00:00' para garantir que a data seja interpretada como local/UTC 00:00
+    const start = new Date(state.startDate + 'T00:00:00'); 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zera hora para cálculo correto
+    
+    // Calcula a diferença em milissegundos
+    const diffTime = today - start;
+    // Converte para dias (Arredonda para baixo para considerar o dia de início como dia 1)
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Retorna o dia do plano esperado (Dia 1, Dia 2...)
+    return diffDays + 1; 
+  }
+  
+  // Encontra o PRIMEIRO dia não lido
+  function findNextUnreadDay() {
+      if (!state.planoId) return null;
+      // Procura do dia 1 ao 365
+      for (let day = 1; day <= 365; day++) {
+          const key = `${state.planoId}_day_${day}`;
+          if (!localStorage.getItem(key)) {
+              return day; // Este é o dia "META"
+          }
+      }
+      return 365; // Se tudo estiver lido, sugere o último dia
+  }
+
   // Alterna a visualização entre as duas "páginas"
   function showPage(pageId) {
       const selecao = document.getElementById('paginaSelecao');
       const plano = document.getElementById('paginaPlano');
       const texts = UI_TEXT[state.idioma];
 
+      // Atualiza textos da página de seleção
+      document.getElementById('tituloSelecao').innerText = texts.titulo_selecao;
+      document.getElementById('subtituloSelecao').innerText = texts.subtitulo_selecao;
+
       if (pageId === 'paginaPlano' && state.planoId) {
           // Exibir Página do Plano
-          selecao.classList.add('hidden'); // Usa 'hidden' para ocultar
-          plano.classList.remove('hidden'); // Usa 'hidden' para mostrar
+          selecao.classList.add('hidden'); 
+          plano.classList.remove('hidden'); 
           
           document.getElementById('tituloApp').innerText = ` ${texts.titulo}`;
           document.getElementById('subtituloApp').innerText = texts.subtitulo;
@@ -501,6 +629,42 @@
       if(window.lucide) window.lucide.createIcons();
   }
 
+  // NOVO: Função para Iniciar/Selecionar um Plano (Chamada pelo botão "Iniciar Plano")
+  function startPlan(planId){
+    state.planoId = planId; 
+    localStorage.setItem('bib_plano', planId); 
+    
+    // Define a data de início para hoje se ainda não estiver definida (lógica do botão "Iniciar")
+    if(!state.startDate) {
+        const today = new Date().toISOString().split('T')[0];
+        state.startDate = today;
+        localStorage.setItem('bib_startDate', today);
+    } 
+    
+    showPage('paginaPlano');
+  }
+
+  // NOVO: Função para limpar o progresso e voltar à seleção (Chamada pelo modal de Aviso)
+  function fullPlanChange(){
+      if (!state.planoId) {
+          showPage('paginaSelecao');
+          return;
+      }
+      
+      // 1. Limpar progresso do plano anterior (dias lidos)
+      for(let day=1; day<=365; day++){
+          localStorage.removeItem(`${state.planoId}_day_${day}`);
+      }
+      
+      // 2. Limpar o ID do plano no estado e storage
+      state.planoId = null;
+      localStorage.removeItem('bib_plano');
+      
+      // 3. Navegar para a página de seleção
+      showPage('paginaSelecao');
+  }
+
+
   // ---------- RENDER FUNCTIONS ----------
   function renderPlanGrid(){
     const container = document.getElementById('gridPlanos'); 
@@ -508,53 +672,53 @@
     
     container.innerHTML='';
     const texts = UI_TEXT[state.idioma].planos;
-    const commonTexts = UI_TEXT[state.idioma]; 
     const icons = ['calendar','clock','layers','heart','book-open','sun'];
+    
     texts.forEach((p, idx)=>{
-      const btn = document.createElement('button');
-      btn.type='button';
-      const isSelected = state.planoId===p.id; // <-- Check if current plan is selected
+      const isSelected = state.planoId===p.id;
+      const card = document.createElement('div');
       
-      // Determine classes for selected vs unselected card
-      const cardClasses = isSelected 
-          ? 'bg-primary-500 text-white ring-4 ring-primary-500/50 hover:bg-primary-600' // Selected Style
-          : 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500'; // Unselected Style
-          
-      btn.className='plan-button flex flex-col items-center p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' + cardClasses;
-      btn.style.minHeight='120px';
+      card.className='flex flex-col p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' +
+                    (isSelected ? 'bg-primary-500 text-white ring-4 ring-primary-500/50' : 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500');
+      card.style.minHeight='160px'; // Aumentado para caber o botão
       
-      // Determine colors for content
       const iconColor = isSelected ? 'text-white' : 'text-primary-500';
       const descColor = isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400';
       const iconName = icons[idx] || 'book';
       
-      // Dynamic Text: Status (Description)
-      const statusText = isSelected ? commonTexts.plano_ativo : p.desc;
-      
-      // Dynamic Text: Action (Button Text)
-      const actionText = isSelected ? commonTexts.continuar : commonTexts.iniciar;
-      const actionClasses = isSelected 
-          ? 'mt-3 text-base font-bold text-white' // Style for 'Continuar' on selected card
-          : 'mt-3 text-base font-bold text-primary-500 dark:text-primary-400'; // Style for 'Iniciar' on unselected card
-
-
-      btn.innerHTML = `\
+      let cardContent = `\
         <div class="mb-2"><i data-lucide="${iconName}" class="lucide w-8 h-8 ${iconColor}"></i></div>\
         <div class="text-base font-bold">${p.title}</div>\
-        <p class="text-xs ${descColor} mt-1">${statusText}</p>\
-        <p class="${actionClasses}">${actionText}</p>`; // Updated to show dynamic action text
+        <div class="text-xs ${descColor} mt-1 flex-1">${p.desc}</div>`;
+      
+      // ** NOVO: Adiciona o botão INICIAR ou o status de Plano Atual **
+      if(!isSelected){
+         // Botão "Iniciar Plano" (o seu botão iniciar na seleção)
+         cardContent += `<button type="button" class="mt-4 w-full px-4 py-2 rounded-lg font-bold transition bg-primary-500 text-white hover:bg-primary-600 shadow-md" data-plan-id="${p.id}">
+             ${UI_TEXT[state.idioma].btn_iniciar_plano} 
+         </button>`;
+      } else {
+         // Se já selecionado, mostra o status
+         cardContent += `<div class="mt-4 w-full px-4 py-2 rounded-lg font-bold bg-meta-500 text-white shadow-md text-center">
+             ${UI_TEXT[state.idioma].plano_atual}
+         </div>`;
+      }
 
-      btn.onclick = ()=>{
-        state.planoId = p.id; 
-        localStorage.setItem('bib_plano', p.id); 
-        showPage('paginaPlano');
-      };
-      container.appendChild(btn);
+      card.innerHTML = cardContent;
+      
+      // Adicionar listener ao botão INICIAR
+      const startButton = card.querySelector(`[data-plan-id="${p.id}"]`);
+      if(startButton){
+        startButton.onclick = () => startPlan(p.id);
+      }
+      
+      container.appendChild(card);
     });
     if(window.lucide) window.lucide.createIcons();
   }
 
   function renderMonths(){
+    // ... (Mantido o mesmo)
     const div = document.getElementById('meses'); 
     if (!div) return;
     
@@ -572,6 +736,7 @@
     
     const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
     if(currentMonthButton){
+        // Scroll para o mês atual
         currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
@@ -585,46 +750,72 @@
     const startDayOfYear = monthDayToDayOfYear(month,1);
     const plan = getPlan(state.planoId, state.idioma);
     
-    // Calcula o dia do ano de hoje para destaque
+    // 1. Calcula os dias de referência para destaque
     const today = new Date();
-    const todayDayOfYear = getDayOfYear(today);
     const todayMonth = today.getMonth() + 1;
     const todayDayOfMonth = today.getDate();
     
+    const nextUnreadDay = findNextUnreadDay(); // Dia 1-365 que é a META
+    const expectedDay = getDaysSinceStart(); // Dia 1-365 esperado pelo Start Date
+
     for(let d=1; d<=daysInMonth; d++){
       const dayOfYear = startDayOfYear + d -1; const idx = dayOfYear -1; const refs = plan[idx] || [];
       const key = `${state.planoId}_day_${dayOfYear}`; const lido = localStorage.getItem(key);
       const card = document.createElement('div');
       
-      // NOVO: Verifica se o dia é hoje
+      // 2. Lógica dos destaques
       const isToday = (month === todayMonth && d === todayDayOfMonth);
+      const isMetaDay = (dayOfYear === nextUnreadDay);
+      const isExpectedDay = state.startDate && (dayOfYear === expectedDay);
       
       let cardClasses = 'p-4 rounded-xl shadow-md border-t-2 cursor-pointer transition';
       
-      if (isToday) {
-          // Aplica o destaque se for o dia de hoje
-          cardClasses += ' today-highlight'; 
+      if (lido) {
+        // Se lido, cor de fundo mais suave
+        cardClasses += ' border-primary-500 bg-gray-100 dark:bg-gray-700 opacity-90';
+      } else if (isMetaDay) {
+          cardClasses += ' next-day-highlight'; // META (Prioritário)
+      } else if (isToday) {
+          cardClasses += ' today-highlight'; // HOJE
       } else {
           // Classes normais para dias passados/futuros
-          cardClasses += (lido ? ' border-primary-500 opacity-90' : ' border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500') +
+          cardClasses += ' border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500' +
                          ' bg-white dark:bg-gray-800';
       }
+      
+      if (!lido && !isMetaDay && !isToday && isExpectedDay) {
+         cardClasses += ' border-dashed border-yellow-500/50';
+      }
+
 
       card.className = cardClasses;
       
       const preview = refs.slice(0,2).join(', ');
-      const iconName = lido ? 'check-circle' : 'chevrons-right';
-      const iconColor = lido ? 'text-primary-500' : (isToday ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500');
+      
+      let iconName = 'chevrons-right'; 
+      let iconColor = isMetaDay ? 'text-meta-500' : 'text-gray-400 dark:text-gray-500';
+
+      if (lido) {
+        iconName = 'check-circle';
+        iconColor = 'text-primary-500'; // Azul para Concluído
+      } else if (isMetaDay) {
+        iconName = 'target'; 
+        iconColor = 'text-meta-600'; // Esmeralda para META
+      } else if (isToday) {
+        iconName = 'calendar-check';
+        iconColor = 'text-blue-500'; // Azul para HOJE
+      }
+
 
       card.innerHTML = `\
         <div class="flex justify-between items-start">\
           <div>\
-            <h3 class="text-xl font-extrabold ${isToday ? 'text-primary-600 dark:text-primary-400' : 'text-primary-500'}">${d}</h3>\
-            <p class="text-xs ${isToday ? 'text-primary-400 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'} font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
+            <h3 class="text-xl font-extrabold ${isMetaDay ? 'text-meta-600 dark:text-meta-400' : 'text-primary-500'}">${d}</h3>\
+            <p class="text-xs ${isMetaDay ? 'text-meta-400 dark:text-meta-300' : 'text-gray-500 dark:text-gray-400'} font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
           </div>\
           <div class="${iconColor} flex-shrink-0"><i data-lucide="${iconName}" class="lucide w-6 h-6"></i></div>\
         </div>\
-        <p class="mt-3 text-sm font-medium ${isToday ? 'text-gray-800 dark:text-gray-100' : 'text-gray-700 dark:text-gray-200'}">${preview}${refs.length>2? ' ...' : ''}</p>`;
+        <p class="mt-3 text-sm font-medium ${isMetaDay ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-200'}">${preview}${refs.length>2? ' ...' : ''}</p>`;
       card.onclick = ()=> abrirModalForDay(dayOfYear);
       container.appendChild(card);
     }
@@ -633,31 +824,113 @@
   }
 
   function formatDateSmall(month, day){ const months = MONTHS[state.idioma]; return `${months[month-1]} ${day}`; }
+  
+  // Função auxiliar para formatar a data (AAAA-MM-DD) para exibição (DD/MM/AAAA)
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  }
 
   let modalCurrentDay = null;
+  let modalMode = 'leitura'; // 'leitura' ou 'config' ou 'reset' ou 'change_plan_warning'
   const modalDiv = document.getElementById('modal');
   const modalContent = document.getElementById('modalContent');
+  const modalLeituras = document.getElementById('modalLeituras');
+  const modalConfiguracao = document.getElementById('modalConfiguracao');
+  const modalBotoes = document.getElementById('modalBotoes');
+  const modalStatus = document.getElementById('modalStatus'); // NOVO: Elemento de status
+  const btnLido = document.getElementById('btnLido');
+  const btnLerAgora = document.getElementById('btnLerAgora');
+  const btnConfirmar = document.getElementById('btnConfirmar');
+  const btnCancelar = document.getElementById('btnCancelar');
+  const btnAcaoSecundaria = document.getElementById('btnAcaoSecundaria');
+  const inputDataInicio = document.getElementById('inputDataInicio');
 
-  function abrirModalForDay(dayOfYear){
-    if (!state.planoId) return;
-    modalCurrentDay = dayOfYear;
-    const plan = getPlan(state.planoId, state.idioma);
-    const refs = plan[dayOfYear-1] || [];
-    document.getElementById('modalTitulo').innerText = `${UI_TEXT[state.idioma].start} • ${UI_TEXT[state.idioma].dia_leitura} ${dayOfYear}`;
-    const ul = document.getElementById('modalLeituras'); ul.innerHTML = '';
+
+  // Função principal para abrir o modal
+  function abrirModal(mode){
+    modalMode = mode;
+    modalLeituras.classList.add('hidden');
+    modalConfiguracao.classList.add('hidden');
+    modalStatus.classList.add('hidden'); // Oculta o status por padrão
+    btnLido.classList.add('hidden');
+    btnLerAgora.classList.add('hidden');
+    btnConfirmar.classList.add('hidden');
+    btnCancelar.classList.add('hidden');
+    btnAcaoSecundaria.classList.add('hidden');
+    inputDataInicio.classList.add('hidden');
+    document.getElementById('modalMsg').innerHTML = '';
+    // Reseta a cor de fundo do modalContent para o padrão (para o caso de ser um dia lido)
+    modalContent.classList.remove('bg-gray-100', 'dark:bg-gray-700'); 
+
+    const texts = UI_TEXT[state.idioma];
+
+    if (mode === 'leitura') {
+        // Modo Leitura (chamado por abrirModalForDay)
+        modalLeituras.classList.remove('hidden');
+        btnLido.classList.remove('hidden');
+        btnLerAgora.classList.remove('hidden');
+        
+        // Verifica se o dia atual está lido e atualiza o visual/texto
+        updateModalReadingState(modalCurrentDay);
+
+    } else if (mode === 'config') {
+        // Modo Configuração (Data de Início) - Contém o botão Reset/Limpeza
+        modalConfiguracao.classList.remove('hidden');
+        document.getElementById('modalTitulo').innerText = texts.configuracao;
+        document.getElementById('modalMsg').innerText = texts.btn_iniciar + ':'; // Texto "Definir Data de Início:"
+        
+        inputDataInicio.value = state.startDate || new Date().toISOString().split('T')[0];
+        inputDataInicio.classList.remove('hidden');
+        
+        btnConfirmar.innerText = texts.btn_salvar;
+        btnConfirmar.classList.remove('hidden');
+        btnCancelar.innerText = texts.cancelar;
+        btnCancelar.classList.remove('hidden');
+        
+        // Botão de Reset
+        btnAcaoSecundaria.innerText = texts.reset_plano;
+        btnAcaoSecundaria.classList.remove('hidden');
+        btnAcaoSecundaria.onclick = () => { fecharModal(); abrirModal('reset_warning'); }; 
+        btnConfirmar.onclick = handleModalConfirm; // Ação de Confirmação é Salvar
+        btnCancelar.onclick = fecharModal;
+
+    } else if (mode === 'reset_warning') {
+        // Modo Aviso de Reset (Limpeza de Cache com Alerta)
+        modalConfiguracao.classList.remove('hidden');
+        document.getElementById('modalTitulo').innerText = texts.reset_titulo;
+        document.getElementById('modalMsg').innerHTML = texts.reset_msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        btnConfirmar.innerText = texts.reset_confirmar;
+        btnConfirmar.classList.remove('hidden');
+        // AÇÃO DIRETA DE LIMPAR TUDO
+        btnConfirmar.onclick = () => { fecharModal(); resetApp(); }; 
+        
+        btnCancelar.innerText = texts.cancelar;
+        btnCancelar.classList.remove('hidden');
+        btnCancelar.onclick = fecharModal;
+
+    } else if (mode === 'change_plan_warning') {
+        // NOVO: Modo Aviso de Troca de Plano
+        modalConfiguracao.classList.remove('hidden');
+        document.getElementById('modalTitulo').innerText = texts.change_plan_titulo;
+        document.getElementById('modalMsg').innerHTML = texts.change_plan_msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        btnConfirmar.innerText = texts.change_plan_confirmar;
+        btnConfirmar.classList.remove('hidden');
+        // AÇÃO DIRETA DE TROCAR PLANO E RESETAR PROGRESSO
+        btnConfirmar.onclick = () => { fecharModal(); fullPlanChange(); }; 
+        
+        btnCancelar.innerText = texts.cancelar;
+        btnCancelar.classList.remove('hidden');
+        btnCancelar.onclick = fecharModal;
+    }
     
-    refs.forEach(r=>{
-      const li = document.createElement('li'); li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
-      const icon = document.createElement('i'); icon.setAttribute('data-lucide', 'book-open'); icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
-      const span = document.createElement('span'); span.innerText = r;
-      li.appendChild(icon);
-      li.appendChild(span);
-      ul.appendChild(li);
-    });
-    
-    document.getElementById('btnLido').innerText = UI_TEXT[state.idioma].marcar;
-    document.getElementById('btnLerAgora').innerText = `📖 ${UI_TEXT[state.idioma].ler_agora}`;
-    
+    // Configuração visual do modal (Fade-in)
     modalDiv.classList.remove('hidden');
     setTimeout(()=>{
       modalDiv.style.opacity = '1';
@@ -666,23 +939,130 @@
 
     if(window.lucide) window.lucide.createIcons();
   }
+  
+  // NOVO: Função para atualizar o estado visual do modal de leitura
+  function updateModalReadingState(dayOfYear) {
+      if (!state.planoId) return;
+      const key = `${state.planoId}_day_${dayOfYear}`;
+      const lido = localStorage.getItem(key);
+      const texts = UI_TEXT[state.idioma];
+
+      if (lido) {
+          // Se lido: Muda o fundo do modal, exibe status e muda o botão para desmarcar
+          modalContent.classList.add('bg-gray-100', 'dark:bg-gray-700'); 
+          modalStatus.innerText = texts.concluido;
+          modalStatus.classList.remove('hidden');
+          btnLido.innerText = texts.desmarcar;
+          btnLido.classList.remove('bg-primary-500', 'hover:bg-primary-600');
+          btnLido.classList.add('bg-red-600', 'hover:bg-red-700');
+      } else {
+          // Se não lido: Remove o fundo cinza, oculta status e muda o botão para marcar
+          modalContent.classList.remove('bg-gray-100', 'dark:bg-gray-700'); 
+          modalStatus.classList.add('hidden');
+          btnLido.innerText = texts.marcar;
+          btnLido.classList.remove('bg-red-600', 'hover:bg-red-700');
+          btnLido.classList.add('bg-primary-500', 'hover:bg-primary-600');
+      }
+  }
+
+
+  function abrirModalForDay(dayOfYear){
+    if (!state.planoId) return;
+    modalCurrentDay = dayOfYear;
+    const plan = getPlan(state.planoId, state.idioma);
+    const refs = plan[dayOfYear-1] || [];
+    document.getElementById('modalTitulo').innerText = `${UI_TEXT[state.idioma].start} • ${UI_TEXT[state.idioma].dia_leitura} ${dayOfYear}`;
+    
+    modalLeituras.innerHTML = '';
+    
+    refs.forEach(r=>{
+      const li = document.createElement('li'); li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
+      const icon = document.createElement('i'); icon.setAttribute('data-lucide', 'book-open'); icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
+      const span = document.createElement('span'); span.innerText = r;
+      li.appendChild(icon);
+      li.appendChild(span);
+      modalLeituras.appendChild(li);
+    });
+    
+    abrirModal('leitura');
+    // Chama a função para garantir o estado visual correto após a abertura
+    updateModalReadingState(dayOfYear); 
+  }
 
   function fecharModal(){
     modalDiv.style.opacity = '0';
     modalContent.classList.add('scale-95');
+    // Reinicia o onclick do botão confirmar para o padrão (Salvar Data de Início)
+    btnConfirmar.onclick = handleModalConfirm; 
     setTimeout(()=> modalDiv.classList.add('hidden'), 300); 
   }
 
-  document.getElementById('fecharModal').addEventListener('click', fecharModal);
-  
+  // Lógica para marcar/desmarcar
   document.getElementById('btnLido').addEventListener('click', ()=>{
     if(!modalCurrentDay) return; 
     const key = `${state.planoId}_day_${modalCurrentDay}`; 
-    localStorage.setItem(key,'1'); 
-    fecharModal(); 
+    
+    // Toggle (Marcar/Desmarcar)
+    if(localStorage.getItem(key)) {
+        localStorage.removeItem(key); // Desmarcar
+    } else {
+        localStorage.setItem(key,'1'); // Marcar
+    }
+    
+    // Atualiza o estado do modal instantaneamente
+    updateModalReadingState(modalCurrentDay);
+
+    // Re-renderizar a grade de dias e o progresso
+    const { month } = dayOfYearToMonthDay(modalCurrentDay);
+    if (state.selectedMonth !== month) {
+      state.selectedMonth = month;
+      renderMonths();
+    }
     renderDays(state.selectedMonth); 
     updateProgressUI();
   });
+
+  // Listener para o botão de Configuração/Iniciar (na página do plano)
+  document.getElementById('btnConfiguracao').addEventListener('click', () => {
+      if (!state.planoId) return;
+      btnConfirmar.onclick = handleModalConfirm; 
+      abrirModal('config');
+  });
+
+  // Ação de Confirmação (Salvar Data de Início)
+  function handleModalConfirm() {
+      if (modalMode === 'config') {
+          const newDate = inputDataInicio.value;
+          if (newDate) {
+              // Salva a data de início para a lógica de atraso/adiantamento
+              state.startDate = newDate;
+              localStorage.setItem('bib_startDate', newDate);
+              updateProgressUI(); // Atualiza UI com novo status
+              renderDays(state.selectedMonth); // Re-renderiza para atualizar destaques
+              fecharModal();
+          }
+      }
+  }
+  btnConfirmar.addEventListener('click', handleModalConfirm);
+  btnCancelar.addEventListener('click', fecharModal);
+
+
+  // Função para Resetar o Aplicativo (Limpeza de Cache Total)
+  function resetApp() {
+      for(let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith('bib_') || key.includes('_day_')) { 
+              localStorage.removeItem(key);
+              i--; 
+          }
+      }
+      state.idioma = 'pt';
+      state.planoId = null;
+      state.startDate = null;
+      state.selectedMonth = 1;
+      location.reload(); 
+  }
+
 
   document.getElementById('btnLerAgora').addEventListener('click', ()=>{
     if(!modalCurrentDay || !state.planoId) return; 
@@ -708,23 +1088,73 @@
     const progressoBar = document.getElementById('progressoBar');
     const textoProgresso = document.getElementById('textoProgresso');
     const textoPlanoAtual = document.getElementById('textoPlanoAtual');
+    const textoDataInicio = document.getElementById('textoDataInicio');
+    const btnMeta = document.getElementById('btnMeta');
+    const btnConfiguracao = document.getElementById('btnConfiguracao'); 
 
     if (progressoBar) progressoBar.style.width = pct + '%';
     if (textoProgresso) textoProgresso.innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}`;
     
     const planoEncontrado = UI_TEXT[state.idioma].planos.find(p=>p.id===state.planoId);
     const planName = planoEncontrado ? planoEncontrado.title : '---';
-    if (textoPlanoAtual) textoPlanoAtual.innerText = `${UI_TEXT[state.idioma].plano}: ${planName}`;
       
     const trocarPlanoLink = document.getElementById('trocarPlanoLink');
     if (trocarPlanoLink) trocarPlanoLink.querySelector('span').innerText = `${UI_TEXT[state.idioma].plano}: ${planName} • ${UI_TEXT[state.idioma].link_trocar}`;
+
+    // Atualiza Data de Início e Status de Atraso/Botão Configuração
+    if (textoDataInicio && btnConfiguracao) {
+        if (state.startDate) {
+            // Lógica de Atraso/Adiantamento
+            const expectedDay = getDaysSinceStart();
+            const nextUnreadDay = findNextUnreadDay();
+            const diff = expectedDay - nextUnreadDay; // > 0: Atrasado, 0: Em dia, < 0: Adiantado
+
+            let statusText = '';
+            if (diff > 0) {
+                statusText = UI_TEXT[state.idioma].status_atraso.replace('{dias}', diff);
+            } else if (diff === 0) {
+                statusText = UI_TEXT[state.idioma].status_emdia;
+            } else {
+                statusText = UI_TEXT[state.idioma].status_adiantado.replace('{dias}', Math.abs(diff));
+            }
+            
+            // Texto principal da data
+            const inicio = UI_TEXT[state.idioma].data_inicio;
+            const dataFmt = formatDisplayDate(state.startDate);
+            textoDataInicio.innerHTML = `${inicio}: <strong>${dataFmt}</strong><br><span class="text-xs text-gray-500 dark:text-gray-400">${statusText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>`;
+
+            // Botão: Configurações do Plano
+            btnConfiguracao.innerHTML = `<i data-lucide="settings" class="lucide w-4 h-4 mr-1"></i><span id="textoConfiguracao">${UI_TEXT[state.idioma].configuracao}</span>`;
+            
+
+            // Habilita o botão META
+            if(btnMeta) btnMeta.disabled = false;
+
+        } else {
+            // Texto: Data de Início não definida
+            textoDataInicio.innerText = `${UI_TEXT[state.idioma].data_inicio}: ${UI_TEXT[state.idioma].nao_definido}`;
+            
+            // ** BOTÃO INICIAR (Definir Data de Início) **
+            btnConfiguracao.innerHTML = `<i data-lucide="calendar-check" class="lucide w-4 h-4 mr-1"></i><span id="textoConfiguracao">${UI_TEXT[state.idioma].btn_iniciar}</span>`;
+            
+             // Desabilita o botão META
+            if(btnMeta) btnMeta.disabled = true;
+        }
+    }
+    if(window.lucide) window.lucide.createIcons();
   }
 
-  // EVENTO DO LINK "TROCAR PLANO"
+  // NOVO: EVENTO DO LINK "TROCAR PLANO" - Com Aviso
   document.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'trocarPlanoLink' || e.target.closest('#trocarPlanoLink')) {
           e.preventDefault();
-          showPage('paginaSelecao');
+          // Se já existe plano, abre o modal de aviso antes de prosseguir
+          if(state.planoId) {
+              abrirModal('change_plan_warning');
+          } else {
+              // Se não há plano, apenas navega
+              showPage('paginaSelecao');
+          }
       }
   });
 
@@ -739,10 +1169,8 @@
     const texts = UI_TEXT[lang];
     const flagCode = texts.flag_code;
 
-    // Atualiza o botão principal APENAS com a bandeira
     currentFlag.className = `flag-icon flag-icon-${flagCode}`;
     
-    // Altera o estado de 'selecionado' no menu
     idiomaItems.forEach(item => {
         if(item.getAttribute('data-lang') === lang) {
             item.classList.add('bg-gray-200', 'dark:bg-gray-600');
@@ -791,43 +1219,39 @@
       });
   });
 
-  // Função centralizada de atualização de texto E TRADUÇÃO DO BOTÃO HOJE
+  // Função centralizada de atualização de texto
   function updateUITexts(lang){
-    // Redireciona para a página correta após a mudança de idioma
     showPage(state.planoId ? 'paginaPlano' : 'paginaSelecao');
 
-    // ATUALIZAÇÃO DO BOTÃO HOJE
-    const btnHojeText = document.getElementById('btnHojeText');
-    if (btnHojeText) {
-        btnHojeText.innerText = UI_TEXT[lang].hoje;
+    const btnMetaText = document.getElementById('btnMetaText');
+    if (btnMetaText) {
+        btnMetaText.innerText = UI_TEXT[lang].meta;
     }
   }
 
-  // NOVA FUNÇÃO: Navega para o mês atual e destaca o dia atual
-  function goToToday() {
-      if (!state.planoId) {
-          // Se não houver plano, apenas garante que a página de seleção não está visível.
-          // O ideal é que este botão só seja clicável na página do plano.
+  // Navega para o mês da META e destaca o dia META (Próximo Dia Pendente)
+  function goToMeta() {
+      if (!state.planoId || !state.startDate) {
           return;
       }
 
-      const today = new Date();
-      const currentMonth = today.getMonth() + 1; // Mês atual (1-12)
+      const nextUnreadDay = findNextUnreadDay();
+      if (!nextUnreadDay) return; 
+
+      const { month } = dayOfYearToMonthDay(nextUnreadDay);
       
-      // 1. Atualiza o estado do mês
-      if (state.selectedMonth !== currentMonth) {
-          state.selectedMonth = currentMonth;
+      if (state.selectedMonth !== month) {
+          state.selectedMonth = month;
       }
       
-      // 2. Re-renderiza tudo para aplicar o destaque
       renderMonths();
       renderDays(state.selectedMonth);
       
-      // 3. Rola para o mês atual na barra de meses (opcional, mas bom UX)
-      const mesesContainer = document.getElementById('meses');
-      const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
-      if (mesesContainer && currentMonthButton) {
-          currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const dayOfMonth = nextUnreadDay - monthDayToDayOfYear(month, 1) + 1;
+      const targetCard = document.querySelector(`#dias > div:nth-child(${dayOfMonth})`);
+      
+      if (targetCard) {
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
   }
 
@@ -838,13 +1262,11 @@
     state.planoId = localStorage.getItem('bib_plano');
     state.selectedMonth = state.selectedMonth || (today.getMonth()+1);
     
-    // 1. Inicializa o display do idioma, o que chama updateUITexts
     updateIdiomaDisplay(state.idioma);
     
-    // 2. Adiciona o listener para o novo botão Hoje
-    const btnHoje = document.getElementById('btnHoje');
-    if (btnHoje) {
-        btnHoje.addEventListener('click', goToToday);
+    const btnMeta = document.getElementById('btnMeta');
+    if (btnMeta) {
+        btnMeta.addEventListener('click', goToMeta);
     }
   }
   
@@ -878,7 +1300,7 @@
       // 2. Adiciona listener ao botão de tema
       if(btnTema) btnTema.addEventListener('click', toggleTheme);
 
-      // --- Inicialização Principal (inclui o listener do botão Hoje) ---
+      // --- Inicialização Principal (inclui o listener do botão Meta) ---
       init();
   });
   </script>
