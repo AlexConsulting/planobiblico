@@ -676,11 +676,11 @@
         if (isDark) {
             localStorage.setItem('bib_theme', 'dark');
             // Quando está no modo ESCURO, o botão deve mostrar "CLARO 🌞" para o próximo clique
-            if (themeStatusText) themeStatusText.innerText = 'Claro 🌞'; 
+            if (themeStatusText) themeStatusText.innerText = '🌞'; 
         } else {
             localStorage.removeItem('bib_theme');
             // Quando está no modo CLARO, o botão deve mostrar "ESCURO 🌙" para o próximo clique
-            if (themeStatusText) themeStatusText.innerText = 'Escuro 🌙';
+            if (themeStatusText) themeStatusText.innerText = '🌙';
         }
     }
 
