@@ -27,11 +27,6 @@
             'primary': {
               500: '#4f46e5', // Indigo padrão
               600: '#4338ca', // Indigo mais escuro para hover
-            },
-            // NOVO: Cor para o destaque META
-            'meta': {
-                500: '#10b981', // Emerald
-                600: '#059669',
             }
           }
         }
@@ -41,40 +36,47 @@
 
   <style>
     /* pequeno polimento */
-    .plan-button:active, #idiomaToggle:active, #btnTema:active, #btnMeta:active { transform: scale(.995); }
+    .plan-button:active, #idiomaToggle:active, #btnTema:active, #btnOpenSettings:active { transform: scale(.995); }
     /* transição suave para a barra de progresso */
     #progressoBar { transition: width 350ms ease; }
     
-    /* Estilo para o destaque META (Contorno) */
-    #btnMeta:active { 
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5); /* Contorno suave Esmeralda */
+    /* NOVO: Estilo para o destaque ao clicar no botão "Hoje" (Contorno) */
+    #btnHoje:active { 
+        transform: scale(.995); 
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5); /* Contorno suave */
     }
 
-    /* Destaque visual para o dia atual no grid de leitura */
+    /* NOVO: Destaque visual para o dia 'esperado' (Em Dia) */
     .today-highlight {
-        border: 2px dashed #3b82f6 !important; /* Cor azul suave */
-        background-color: #eff6ff !important; /* Azul-50 claro */
+        border: 4px solid #4f46e5 !important; /* Cor primária */
+        background-color: #eef2ff !important; /* Indigo-50 claro */
         transform: scale(1.01);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
     }
     .dark .today-highlight {
         --tw-bg-opacity: 1; 
         background-color: rgb(30 41 59 / var(--tw-bg-opacity)) !important; /* slate-800 */
-        border-color: #60a5fa !important; /* Blue-400 light */
+        border-color: #6366f1 !important; /* Indigo-500 light */
+    }
+    
+    /* Destaque visual para o dia marcado como lido (Fundo cinza, solicitado) */
+    .read-highlight {
+        background-color: #f3f4f6 !important; /* gray-100 */
+    }
+    .dark .read-highlight {
+        background-color: rgb(30 41 59 / var(--tw-bg-opacity)) !important; /* slate-800 */
     }
 
-    /* Destaque visual para o dia META (Próximo Dia Pendente) */
-    .next-day-highlight {
-        border: 3px solid #10b981 !important; /* Esmeralda para "Meta" */
-        background-color: #f0fdf4 !important; /* Esmeralda-50 claro */
-        transform: scale(1.02);
-        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    /* NOVO: Estilo para a lista de leituras do modal (Ajuste para planos curtos) */
+    .modal-scroll-area {
+        max-height: 50vh; /* Limita a altura máxima (50% da altura da viewport) */
+        overflow-y: auto; /* Adiciona barra de rolagem vertical se o conteúdo exceder */
+        padding-right: 1rem; /* Adiciona um pequeno padding para evitar que o conteúdo toque na barra de rolagem */
     }
-    .dark .next-day-highlight {
-        --tw-bg-opacity: 1; 
-        background-color: rgb(6 78 59 / var(--tw-bg-opacity)) !important; /* Emerald-900 */
-        border-color: #34d399 !important; /* Emerald-400 light */
-    }
+    
+    /* Ajuste para o scroll suave no modal de configurações */
+    #settingsModalContent, #glossaryModalContent { max-height: 90vh; overflow-y: auto; }
+
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col font-sans">
@@ -108,23 +110,28 @@
             </div>
         </div>
         
-        <button id="btnMeta" class="p-2 px-3 rounded-xl bg-meta-500 text-white hover:bg-meta-600 transition flex items-center justify-center font-semibold text-sm shadow-md shadow-meta-500/30" aria-label="Ir para a meta de leitura">
-          📅 <span id="btnMetaText" class="ml-1 hidden sm:inline">META</span>
+        <button id="btnHoje" class="p-2 px-3 rounded-xl bg-gray-200 dark:bg-gray-700 hover:scale-105 transition flex items-center justify-center font-semibold text-sm" aria-label="Voltar para o dia de hoje">
+          📅 <span id="btnHojeText" class="ml-1 hidden sm:inline">HOJE</span>
+        </button>
+
+        <button id="btnOpenSettings" class="p-2 rounded-xl bg-gray-200 dark:bg-gray-700 hover:scale-105 transition flex items-center justify-center font-semibold text-sm" aria-label="Abrir Configurações">
+            ⚙️
         </button>
 
         <button id="btnTema" class="p-2 px-3 rounded-xl bg-gray-200 dark:bg-gray-700 hover:scale-105 transition flex items-center justify-center font-semibold text-sm" aria-label="Alternar tema">
-          <span id="themeStatusText">🌙</span>
-        </button>
+          <span id="themeStatusText">🌙</span> </button>
       </div>
     </div>
   </header>
   
   <main class="p-4 sm:p-6 flex-1 overflow-auto">
     
+    <div class="max-w-7xl mx-auto flex gap-4 text-sm font-medium border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 px-1">
+        <a id="linkPrivacidade" href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Privacidade (LGPD)</a>
+        <button id="btnAbrirGlossario" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Glossário / Ajuda</button>
+    </div>
+    
     <section id="paginaSelecao" class="pagina max-w-7xl mx-auto w-full">
-      <h2 id="tituloSelecao" class="mt-8 mb-4 text-center text-xl font-bold text-gray-700 dark:text-gray-300">Escolha seu Plano de Leitura</h2>
-      <p id="subtituloSelecao" class="text-center text-gray-500 dark:text-gray-400 mb-8">Seu plano será salvo automaticamente.</p>
-      
       <div id="gridPlanos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mx-auto mt-4">
         </div>
     </section>
@@ -134,23 +141,16 @@
       <div class="px-1 mt-0">
         <div class="flex items-center justify-between mb-2">
           <div class="text-base font-semibold" id="textoProgresso">Progresso: 0 / 365</div>
-          <a href="#" id="trocarPlanoLink" class="text-sm text-primary-500 font-medium hover:text-primary-600 transition flex items-center">
-            <span id="textoPlanoAtual">Plano: Tradicional</span>
-            <i data-lucide="chevron-right" class="lucide w-4 h-4 ml-1"></i>
-          </a>
+          
+          <div id="planInfoDisplay" class="text-sm font-medium flex flex-col items-end p-1">
+            <span id="textoPlanoAtual" class="text-gray-800 dark:text-gray-100 flex items-center">Plano: Tradicional</span>
+            <span id="textoDataInicio" class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5"></span>
+          </div>
+
         </div>
         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3.5 overflow-hidden">
           <div id="progressoBar" class="bg-primary-500 h-3.5 rounded-full" style="width:0%"></div>
         </div>
-        
-        <div class="mt-4 flex items-center justify-between px-1 border-b pb-3 border-gray-200 dark:border-gray-700">
-            <button id="btnConfiguracao" class="text-sm text-gray-500 dark:text-gray-400 font-medium hover:text-primary-500 transition flex items-center">
-                <i data-lucide="settings" class="lucide w-4 h-4 mr-1"></i>
-                <span id="textoConfiguracao">Configurações do Plano</span>
-            </button>
-            <span id="textoDataInicio" class="text-sm text-right text-gray-500 dark:text-gray-400">Início: Não definido</span>
-        </div>
-
       </div>
       
       <div class="mt-8">
@@ -167,52 +167,150 @@
   <div id="modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
     <div id="modalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-md shadow-2xl scale-95 transition-transform duration-300">
       <div class="flex justify-between items-start">
-        <div class="flex flex-col">
-          <h3 id="modalTitulo" class="text-2xl font-extrabold text-primary-500"></h3>
-          <p id="modalStatus" class="mt-1 text-sm text-red-600 dark:text-red-400 italic font-semibold hidden"></p> 
-        </div>
+        <h3 id="modalTitulo" class="text-2xl font-extrabold text-primary-500"></h3>
         <button id="fecharModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
           <i data-lucide="x" class="lucide w-6 h-6"></i>
         </button>
       </div>
 
-      <div id="modalCustomContent" class="mt-4 space-y-4 text-gray-700 dark:text-gray-200 border-t pt-4 border-gray-200 dark:border-gray-700">
-        <ul id="modalLeituras" class="space-y-2"></ul>
-        <div id="modalConfiguracao" class="hidden">
-            <p id="modalMsg"></p>
-            <input type="date" id="inputDataInicio" class="w-full mt-2 p-2 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-center font-semibold hidden"/>
-            <div class="mt-4 space-y-2">
-                <button id="btnAcaoSecundaria" class="w-full px-4 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition shadow-lg shadow-red-600/30">Apagar Tudo (Reset)</button>
-            </div>
-        </div>
-      </div>
-      
-      <div id="modalBotoes" class="mt-6 flex gap-3">
+      <ul id="modalLeituras" class="modal-scroll-area mt-4 space-y-2 text-gray-700 dark:text-gray-200 border-t pt-4 border-gray-200 dark:border-gray-700"></ul>
+
+      <div class="mt-6 flex gap-3">
         <button id="btnLido" class="flex-1 px-4 py-3 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition shadow-lg shadow-primary-500/30">✔ Marcar como lido</button>
         <button id="btnLerAgora" class="px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">📖 Ler agora</button>
-        <button id="btnConfirmar" class="flex-1 px-4 py-3 rounded-xl bg-meta-500 text-white font-semibold hover:bg-meta-600 transition shadow-lg shadow-meta-500/30 hidden">Confirmar</button>
-        <button id="btnCancelar" class="px-4 py-3 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition hidden">Cancelar</button>
       </div>
     </div>
   </div>
 
+  <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+    <div id="settingsModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-md shadow-2xl scale-95 transition-transform duration-300">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-2xl font-extrabold text-primary-500" id="settingsModalTitle">Configurações</h3>
+            <button id="fecharSettingsModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="x" class="lucide w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <label for="planDurationSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duração do Plano:</label>
+                <select id="planDurationSelect" class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-xl bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
+                    </select>
+                <p id="durationWarning" class="mt-2 text-xs text-gray-500 dark:text-gray-400">Alterar a duração do plano forçará o recálculo e o progresso pode ser perdido.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="btnTrocarPlano" class="flex-1 px-4 py-3 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition shadow-lg shadow-primary-500/30">
+                    Trocar Plano
+                </button>
+                <button id="btnResetarProgresso" class="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition shadow-lg shadow-red-500/30">
+                    Resetar Progresso
+                </button>
+            </div>
+
+            <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h4 class="text-base font-bold mb-3" id="backupRestoreTitle">Backup e Restauração</h4>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="btnExport" class="flex-1 px-4 py-3 rounded-xl bg-gray-600 text-white font-semibold hover:bg-gray-700 transition">
+                        Exportar Progresso (JSON)
+                    </button>
+                    <button id="btnImport" class="flex-1 px-4 py-3 rounded-xl bg-gray-600 text-white font-semibold hover:bg-gray-700 transition">
+                        Importar Progresso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+<div id="confirmChangePlanModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+  <div id="confirmChangePlanContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-sm shadow-2xl scale-95 transition-transform duration-300">
+    <div class="text-center">
+      <i data-lucide="alert-triangle" class="lucide w-10 h-10 text-red-500 mx-auto mb-4"></i>
+      <h3 id="confirmTitle" class="text-xl font-extrabold text-gray-900 dark:text-gray-100 mb-2">Atenção!</h3>
+      <p id="confirmMessage" class="text-gray-600 dark:text-gray-400 mb-6">Trocar de plano irá **apagar todo o seu progresso atual** (dias marcados e data de início). Deseja continuar?</p>
+      
+      <div class="flex gap-3">
+        <button id="btnCancelChangePlan" class="flex-1 px-4 py-3 rounded-xl bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+          Cancelar
+        </button>
+        <button id="btnConfirmChangePlan" class="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition shadow-lg shadow-red-500/30">
+          Sim, Apagar Histórico
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="glossaryModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+    <div id="glossaryModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-lg shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-2xl font-extrabold text-primary-500" id="glossaryModalTitle">Glossário / Ajuda</h3>
+            <button id="fecharGlossaryModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="x" class="lucide w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4 text-gray-700 dark:text-gray-300">
+            <h4 class="text-lg font-bold text-primary-500">Funcionalidades Principais</h4>
+            <ul class="space-y-3">
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="calendar" class="lucide w-5 h-5 text-primary-500"></i></span>
+                    <p><strong>Plano Ativo (Círculo Azul)</strong>: Indica o plano de leitura que está em uso no momento.</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0">📅</span>
+                    <p><strong>Botão HOJE</strong>: Redireciona rapidamente a visualização para o mês e dia da leitura que deveria ser feita hoje.</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0">⚙️</span>
+                    <p><strong>Configurações</strong>: Permite alterar a duração do plano (1 ano, 6 meses, 3 meses), resetar o progresso ou trocar de plano.</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0">📖</span>
+                    <p><strong>Botão "Ler agora"</strong>: Abre os versículos de leitura em uma nova aba no Bible Gateway, na versão (NVI-PT/NIV) correspondente ao idioma da aplicação.</p>
+                </li>
+            </ul>
+            
+            <h4 class="text-lg font-bold text-primary-500 pt-4 border-t border-gray-200 dark:border-gray-700">Ícones nos Dias de Leitura</h4>
+            <ul class="space-y-3">
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="check-circle" class="lucide w-5 h-5 text-red-500"></i></span>
+                    <p><strong>Dia Concluído</strong>: O dia foi marcado como lido (fundo cinza claro e ícone vermelho).</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="chevrons-right" class="lucide w-5 h-5 text-gray-400"></i></span>
+                    <p><strong>Dia Não Lido (Pendente)</strong>: Leitura ainda não marcada como lida.</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="star" class="lucide w-5 h-5 text-primary-500 fill-primary-500/50"></i></span>
+                    <p><strong>Dia Atual/Em Dia (Borda Azul Grossa)</strong>: Marca o dia de leitura esperado (o dia que você está hoje no plano).</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="mr-3 mt-1 flex-shrink-0">📊</span>
+                    <p><strong>Status de Acompanhamento</strong>: Textos como "Atrasado (X dias)" ou "Adiantado (Y dias)" aparecem se houver uma data de início definida, indicando sua posição em relação ao progresso esperado.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
   <footer class="mt-12 py-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-600 dark:text-gray-400">
-    © 2025 Alex Silva — <em>Uso livre com atribuição</em>
-    <p class="text-xs mt-1">
-        <a href="https://www.instagram.com/alexsilva_prof" target="_blank" class="text-primary-500 hover:underline">@alexsilva_prof</a>
-    </p>
+    <p class="italic">© 2025 Alex Silva. Uso livre com atribuição.</p>
   </footer>
 
   <script>
   
   // ---------- CONFIG / TEXTS ----------
+  // NOVO: DURAÇÕES VÁLIDAS EM DIAS (REMOVIDO '30')
+  const DURATIONS = [365, 180, 90]; 
+  
   const UI_TEXT = {
     pt: {
       titulo: 'Plano Bíblico',
       subtitulo: 'Acompanhe seu progresso',
-      // NOVO: Textos traduzíveis da página de seleção
-      titulo_selecao: 'Escolha seu Plano de Leitura',
-      subtitulo_selecao: 'Seu plano será salvo automaticamente.',
+      titulo_selecao: 'Plano Bíblico',
+      subtitulo_selecao: 'Selecione seu plano.',
       link_trocar: 'Trocar Plano',
       ler_agora: 'Ler agora',
       planos: [
@@ -225,40 +323,50 @@
       ],
       start: 'Dia de Leitura',
       marcar: '✔ Marcar como lido',
-      desmarcar: '❌ Desmarcar como lido', // NOVO: Texto para desmarcar
-      concluido: 'Concluído', // NOVO: Texto para status
       fechar: 'Fechar',
       progresso: 'Progresso',
       plano: 'Plano',
       dia_leitura: 'Dia',
       lang_name: 'Português',
       flag_code: 'br',
-      meta: 'META',
-      configuracao: 'Configurações do Plano',
-      data_inicio: 'Início',
-      btn_iniciar: 'Definir Data de Início', 
-      btn_iniciar_plano: 'Iniciar Plano', 
-      plano_atual: 'Plano Atual', 
-      btn_salvar: 'Salvar',
-      reset_plano: 'Apagar Tudo (Reset)',
-      reset_titulo: 'Confirma Limpeza?',
-      reset_msg: 'Isso apagará **TODO** o seu progresso e plano salvos. Deseja continuar?',
-      reset_confirmar: 'Sim, Apagar Tudo',
-      cancelar: 'Cancelar',
-      status_atraso: 'Você está **{dias} dias** atrasado.',
-      status_emdia: 'Você está **em dia!** Dia de hoje é o seu alvo.',
-      status_adiantado: 'Você está **{dias} dias** adiantado. Parabéns!',
-      nao_definido: 'Não definido',
-      change_plan_titulo: 'Trocar Plano?', 
-      change_plan_msg: 'Trocar de plano apagará todo o seu **progresso atual** e o **plano selecionado**. Deseja prosseguir?',
-      change_plan_confirmar: 'Sim, Trocar Plano',
+      hoje: 'HOJE',
+      lido: 'Leitura Concluída',
+      nao_lido: 'Marcar como lido',
+      
+      // TRADUÇÃO: Textos para Atraso/Adiantamento
+      delayed: 'Atrasado',
+      ahead: 'Adiantado',
+      days_behind: ' dias',
+      days_ahead: ' dias',
+      
+      // NOVO: Textos para Configurações
+      settings: 'Configurações',
+      duration_label: 'Duração do Plano:',
+      duration_options: { 365: '1 Ano (365 Dias)', 180: '6 Meses (180 Dias)', 90: '3 Meses (90 Dias)' },
+      reset_progress: 'Resetar Progresso',
+      backup_restore: 'Backup e Restauração',
+      export_progress: 'Exportar Progresso (JSON)',
+      import_progress: 'Importar Progresso',
+      alert_reset: 'Tem certeza de que deseja resetar todo o seu progresso no plano atual?',
+      alert_import_success: 'Progresso importado com sucesso! Recarregando...',
+      alert_import_error: 'Erro ao importar. O arquivo pode estar corrompido ou em formato inválido.',
+      alert_duration_change: 'Atenção: Alterar a duração recalcula o plano. O progresso marcado APENAS para os dias existentes no NOVO plano será mantido.',
+      start_date_label: 'Início',
+      // Textos para o Modal Customizado
+      alert_title: 'Atenção!', 
+      alert_change_plan: 'Atenção! Trocar de plano irá APAGAR todo o seu progresso atual (dias marcados e data de início). Deseja continuar?',
+      alert_change_plan_html: 'Trocar de plano irá **apagar todo o seu progresso atual** (dias marcados e data de início). Deseja continuar?', 
+      cancel: 'Cancelar', 
+      confirm_erase: 'Sim, Apagar Histórico', 
+      // NOVO: Textos para Links Adicionais
+      privacy_link: 'Privacidade (LGPD)',
+      glossary_link: 'Glossário / Ajuda',
     },
     en: {
         titulo: 'Bible Plan',
         subtitulo: 'Track your progress',
-        // NOVO: Textos traduzíveis da página de seleção
-        titulo_selecao: 'Choose Your Reading Plan',
-        subtitulo_selecao: 'Your plan will be saved automatically.',
+        titulo_selecao: 'Bible Plan',
+        subtitulo_selecao: 'Select your plan.',
         link_trocar: 'Change Plan',
         ler_agora: 'Read now',
         planos: [
@@ -271,83 +379,104 @@
         ],
         start: 'Reading Day',
         marcar: '✔ Mark as read',
-        desmarcar: '❌ Mark as unread', // NOVO: Texto para desmarcar
-        concluido: 'Completed', // NOVO: Texto para status
         fechar: 'Close',
         progresso: 'Progress',
         plano: 'Plan',
         dia_leitura: 'Day',
         lang_name: 'English',
         flag_code: 'us',
-        meta: 'GOAL',
-        configuracao: 'Plan Settings',
-        data_inicio: 'Start Date',
-        btn_iniciar: 'Set Start Date',
-        btn_iniciar_plano: 'Start Plan', 
-        plano_atual: 'Current Plan', 
-        btn_salvar: 'Save',
-        reset_plano: 'Reset/Clear Plan',
-        reset_titulo: 'Confirm Reset?',
-        reset_msg: 'This will erase **ALL** your saved plan and progress. Do you wish to continue?',
-        reset_confirmar: 'Yes, Erase All',
-        cancelar: 'Cancel',
-        status_atraso: 'You are **{dias} days** behind.',
-        status_emdia: 'You are **on track!** Today is your goal.',
-        status_adiantado: 'You are **{dias} days** ahead. Congratulations!',
-        nao_definido: 'Not set',
-        change_plan_titulo: 'Change Plan?', 
-        change_plan_msg: 'Changing the plan will erase all your **current progress** and **selected plan**. Do you want to proceed?',
-        change_plan_confirmar: 'Yes, Change Plan',
+        hoje: 'TODAY',
+        lido: 'Reading Completed',
+        nao_lido: 'Mark as read',
+        
+        // TRADUÇÃO: Textos para Atraso/Adiantamento
+        delayed: 'Behind',
+        ahead: 'Ahead',
+        days_behind: ' days',
+        days_ahead: ' days',
+        
+        // NOVO: Textos para Configurações
+        settings: 'Settings',
+        duration_label: 'Plan Duration:',
+        duration_options: { 365: '1 Year (365 Days)', 180: '6 Months (180 Days)', 90: '3 Months (90 Days)' },
+        reset_progress: 'Reset Progress',
+        backup_restore: 'Backup & Restore',
+        export_progress: 'Export Progress (JSON)',
+        import_progress: 'Import Progress',
+        alert_reset: 'Are you sure you want to reset all your progress for the current plan?',
+        alert_import_success: 'Progress successfully imported! Reloading...',
+        alert_import_error: 'Import error. The file may be corrupted or in an invalid format.',
+        alert_duration_change: 'Warning: Changing the duration recalculates the plan. Progress marked ONLY for existing days in the NEW plan will be kept.',
+        start_date_label: 'Start Date',
+        // Textos para o Modal Customizado
+        alert_title: 'Warning!',
+        alert_change_plan: 'Warning! Changing plans will ERASE all your current progress (marked days and start date). Do you wish to continue?',
+        alert_change_plan_html: 'Warning! Changing plans will **ERASE all your current progress** (marked days and start date). Do you wish to continue?',
+        cancel: 'Cancel',
+        confirm_erase: 'Yes, Erase History',
+        // NOVO: Textos para Links Adicionais
+        privacy_link: 'Privacy (LGPD)',
+        glossary_link: 'Glossary / Help',
     },
     es: {
         titulo: 'Plan Bíblico',
         subtitulo: 'Sigue tu progreso',
-        // NOVO: Textos traduzíveis da página de seleção
-        titulo_selecao: 'Elige tu Plan de Lectura',
-        subtitulo_selecao: 'Tu plan se guardará automáticamente.',
+        titulo_selecao: 'Plan Bíblico',
+        subtitulo_selecao: 'Selecciona tu plan.',
         link_trocar: 'Cambiar Plan',
         ler_agora: 'Leer ahora',
         planos: [
           { id: 'tradicional', title: 'Tradicional', desc: 'Génesis → Apocalipsis (estándar)' },
           { id: 'cronologico', title: 'Cronológico', desc: 'Orden histórico aproximado' },
           { id: 'atnt', title: 'AT + NT', desc: 'Pasaje de AT y NT por día' },
-          { id: 'jesus', title: 'Un Año con Jesús', desc: 'Evangelios → Hechos → Cartas → Resto' },
+          { id: 'jesus', title: 'Un Año con Jesús', desc: 'Gospels → Acts → Letters → Rest' },
           { id: 'umcap', title: '1 Capítulo/Día', desc: '1 capítulo por día (365 selecciones)' },
           { id: 'salmos', title: 'AT+NT+Salmos', desc: 'AT + NT + Salmo/Proverbio diario' }
         ],
         start: 'Día de Lectura',
         marcar: '✔ Marcar como leído',
-        desmarcar: '❌ Desmarcar como leído', // NOVO: Texto para desmarcar
-        concluido: 'Completado', // NOVO: Texto para status
         fechar: 'Cerrar',
         progresso: 'Progreso',
         plano: 'Plan',
         dia_leitura: 'Day',
         lang_name: 'Español',
         flag_code: 'es',
-        meta: 'META',
-        configuracion: 'Configuración del Plan',
-        data_inicio: 'Fecha de Inicio',
-        btn_iniciar: 'Establecer Fecha de Inicio',
-        btn_iniciar_plano: 'Iniciar Plan', 
-        plano_atual: 'Plan Actual', 
-        btn_salvar: 'Guardar',
-        reset_plano: 'Reiniciar/Borrar Plan',
-        reset_titulo: '¿Confirmar Borrado?',
-        reset_msg: 'Esto borrará **TODO** tu progreso y plan guardados. ¿Deseas continuar?',
-        reset_confirmar: 'Sí, Borrar Todo',
-        cancelar: 'Cancelar',
-        status_atraso: 'Estás **{dias} días** atrasado.',
-        status_emdia: 'Estás **al día!** El día de hoy es tu meta.',
-        status_adiantado: 'Estás **{dias} días** adelantado. ¡Felicidades!',
-        nao_definido: 'No definido',
-        change_plan_titulo: '¿Cambiar Plan?', 
-        change_plan_msg: 'Cambiar el plan borrará todo tu **progreso actual** y el **plan seleccionado**. ¿Quieres continuar?',
-        change_plan_confirmar: 'Sí, Cambiar Plan',
+        hoje: 'HOY',
+        lido: 'Lectura Completada',
+        nao_lido: 'Marcar como leído',
+
+        // TRADUÇÃO: Textos para Atraso/Adiantamento
+        delayed: 'Atrasado',
+        ahead: 'Adelantado',
+        days_behind: ' días',
+        days_ahead: ' días',
+        
+        // NOVO: Textos para Configurações
+        settings: 'Ajustes',
+        duration_label: 'Duración del Plan:',
+        duration_options: { 365: '1 Año (365 Días)', 180: '6 Meses (180 Días)', 90: '3 Meses (90 Días)' },
+        reset_progress: 'Restablecer Progreso',
+        backup_restore: 'Copia de Seguridad y Restauración',
+        export_progress: 'Exportar Progreso (JSON)',
+        import_progress: 'Importar Progreso',
+        alert_reset: '¿Estás seguro de que deseas restablecer todo tu progreso para el plan actual?',
+        alert_import_success: 'Progreso importado con éxito. Recargando...',
+        alert_import_error: 'Error al importar. El archivo puede estar corrupto o en formato no válido.',
+        alert_duration_change: 'Advertencia: Cambiar la duración recalcula el plan. El progreso marcado SÓLO para los días existentes en el NUEVO plan se mantendrá.',
+        start_date_label: 'Fecha de Inicio',
+        // Textos para o Modal Customizado
+        alert_title: '¡Advertencia!',
+        alert_change_plan: '¡Advertencia! Cambiar de plan BORRARÁ todo su progreso actual (días marcados y fecha de inicio). ¿Desea continuar?',
+        alert_change_plan_html: '¡Advertencia! Cambiar de plan **BORRARÁ todo su progreso actual** (días marcados y fecha de inicio). ¿Desea continuar?',
+        cancel: 'Cancelar',
+        confirm_erase: 'Sí, Borrar Historial',
+        // NOVO: Textos para Links Adicionais
+        privacy_link: 'Privacidad (LGPD)',
+        glossary_link: 'Glosario / Ayuda',
     }
   };
   
-  // (Constantes de Meses, Livros e Funções de Geração de Plano - MANTIDAS)
+  // (Constantes de Meses, Livros e Ordem Cronológica - MANTIDAS)
   const MONTHS = {
     pt: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
     en: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
@@ -357,7 +486,7 @@
   const BOOKS = [
     { key:'Genesis', ch:50, name:{pt:'Gênesis', en:'Genesis', es:'Génesis'} },
     { key:'Exodus', ch:40, name:{pt:'Êxodo', en:'Exodus', es:'Éxodo'} },
-    { key:'Leviticus', ch:27, name:{pt:'Levítico', en:'Leviticus', es:'Levítico'} },
+    { key:'Leviticus', ch:27, name:{pt:'Levítico', en:'Leviticus', es:'Leviticus'} },
     { key:'Numbers', ch:36, name:{pt:'Números', en:'Numbers', es:'Números'} },
     { key:'Deuteronomy', ch:34, name:{pt:'Deuteronômio', en:'Deuteronomy', es:'Deuteronomio'} },
     { key:'Joshua', ch:24, name:{pt:'Josué', en:'Joshua', es:'Josué'} },
@@ -440,18 +569,20 @@
     '1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther',
     'Isaiah','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Zechariah','Haggai','Malachi',
     'Psalms','Proverbs','Ecclesiastes','Song of Solomon',
-    'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation','Daniel','Jeremiah','Lamentations','Ezekiel'
+    'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','3 John','Jude','Revelation','Daniel','Jeremiah','Lamentations','Ezekiel'
   ];
-  function genTradicional(lang){
-    const total = FLAT.length; const perDay = total / 365; const plan = Array.from({length:365}, ()=>[]); let idx=0;
-    for(let day=0; day<365; day++){
+  
+  // FUNÇÕES DE GERAÇÃO DE PLANO (AGORA USAM DURATION)
+  function genTradicional(lang, duration){
+    const total = FLAT.length; const perDay = total / duration; const plan = Array.from({length:duration}, ()=>[]); let idx=0;
+    for(let day=0; day<duration; day++){
       const take = Math.max(1, Math.round(perDay));
       for(let t=0; t<take && idx<total; t++, idx++) plan[day].push(formatRefObj(FLAT[idx], lang));
     }
     while(idx<total) plan[plan.length-1].push(formatRefObj(FLAT[idx++], lang));
     return plan;
   }
-  function genCronologico(lang){
+  function genCronologico(lang, duration){
     const arr = [];
     for(const k of CHRON_ORDER_KEYS){
       const book = BOOKS.find(b=>b.key===k);
@@ -459,20 +590,20 @@
       for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter: c});
     }
     for(const b of BOOKS) if(!CHRON_ORDER_KEYS.includes(b.key)) for(let c=1;c<=b.ch;c++) arr.push({bookKey: b.key, chapter: c});
-    const total = arr.length; const perDay = total/365; const plan = Array.from({length:365},()=>[]); let idx=0;
-    for(let d=0; d<365; d++){
+    const total = arr.length; const perDay = total/duration; const plan = Array.from({length:duration},()=>[]); let idx=0;
+    for(let d=0; d<duration; d++){
       const take = Math.max(1, Math.round(perDay));
       for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(arr[idx], lang));
     }
     while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++] , lang));
     return plan;
   }
-  function genATNT(lang){
+  function genATNT(lang, duration){
     const mattIndex = FLAT.findIndex(c=>c.bookKey==='Matthew');
     const ot = FLAT.slice(0, mattIndex); const nt = FLAT.slice(mattIndex);
-    const otPer = ot.length/365; const ntPer = nt.length/365;
-    const plan = Array.from({length:365},()=>[]); let i=0,j=0;
-    for(let d=0; d<365; d++){
+    const otPer = ot.length/duration; const ntPer = nt.length/duration;
+    const plan = Array.from({length:duration},()=>[]); let i=0,j=0;
+    for(let d=0; d<duration; d++){
       const takeOT = Math.max(1, Math.round(otPer)); const takeNT = Math.max(1, Math.round(ntPer));
       for(let t=0;t<takeOT && i<ot.length;t++,i++) plan[d].push(formatRefObj(ot[i], lang));
       for(let t=0;t<takeNT && j<nt.length;t++,j++) plan[d].push(formatRefObj(nt[j], lang));
@@ -481,7 +612,7 @@
     while(j<nt.length) plan[plan.length-1].push(formatRefObj(nt[j++], lang));
     return plan;
   }
-  function genJesusYear(lang){
+  function genJesusYear(lang, duration){
     const order = ['Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','3 John','Jude','Revelation'];
     const arr = [];
     for(const name of order){
@@ -490,29 +621,29 @@
       for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter:c});
     }
     for(const b of BOOKS) if(!order.includes(b.key)) for(let c=1;c<=b.ch;c++) arr.push({bookKey: b.key, chapter:c});
-    const total = arr.length; const perDay = total/365; const plan = Array.from({length:365},()=>[]); let idx=0;
-    for(let d=0; d<365; d++){
+    const total = arr.length; const perDay = total/duration; const plan = Array.from({length:duration},()=>[]); let idx=0;
+    for(let d=0; d<duration; d++){
       const take = Math.max(1, Math.round(perDay));
       for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(arr[idx], lang));
     }
     while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++]));
     return plan;
   }
-  function genUmCapitulo(lang){
-    const plan = Array.from({length:365},()=>[]);
-    for(let i=0;i<365;i++){
+  function genUmCapitulo(lang, duration){
+    const plan = Array.from({length:duration},()=>[]);
+    for(let i=0;i<duration;i++){
       if(i<FLAT.length) plan[i].push(formatRefObj(FLAT[i], lang)); else plan[i].push('—');
     }
     return plan;
   }
-  function genComSalmos(lang){
+  function genComSalmos(lang, duration){
     const mattIndex = FLAT.findIndex(c=>c.bookKey==='Matthew');
     const ot = FLAT.slice(0, mattIndex); const nt = FLAT.slice(mattIndex);
     const psStart = FLAT.findIndex(c=>c.bookKey==='Psalms'); const provStart = FLAT.findIndex(c=>c.bookKey==='Proverbs');
     const psCount = BOOKS.find(b=>b.key==='Psalms').ch; const provCount = BOOKS.find(b=>b.key==='Proverbs').ch;
-    const otPer = ot.length/365; const ntPer = nt.length/365;
-    const plan = Array.from({length:365},()=>[]); let i=0,j=0,p=psStart,pr=provStart,alt=true;
-    for(let d=0; d<365; d++){
+    const otPer = ot.length/duration; const ntPer = nt.length/duration;
+    const plan = Array.from({length:duration},()=>[]); let i=0,j=0,p=psStart,pr=provStart,alt=true;
+    for(let d=0; d<duration; d++){
       const takeOT = Math.max(1, Math.round(otPer)); const takeNT = Math.max(1, Math.round(ntPer));
       for(let t=0;t<takeOT && i<ot.length;t++,i++) plan[d].push(formatRefObj(ot[i], lang));
       for(let t=0;t<takeNT && j<nt.length;t++,j++) plan[d].push(formatRefObj(nt[j], lang));
@@ -528,20 +659,25 @@
   }
 
   const PLAN_GENERATORS = { tradicional: genTradicional, cronologico: genCronologico, atnt: genATNT, jesus: genJesusYear, umcap: genUmCapitulo, salmos: genComSalmos };
-  const CACHE = {};
+  let CACHE = {};
+  
+  // getPlan usa a duração do estado
   function getPlan(id, lang){
-    const key = `${id}__${lang}`;
-    if(!CACHE[key]) CACHE[key] = PLAN_GENERATORS[id](lang);
+    const duration = state.planDuration;
+    const key = `${id}__${lang}__${duration}`;
+    if(!CACHE[key]) CACHE[key] = PLAN_GENERATORS[id](lang, duration);
     return CACHE[key];
   }
 
   // ---------- UI & STATE ----------
   let state = {
-    // Carrega o idioma, plano e DATA DE INÍCIO do localStorage ou usa o padrão
+    // Carrega o idioma e o plano do localStorage ou usa o padrão 'pt'/'tradicional'
     idioma: localStorage.getItem('bib_idioma') || 'pt',
     planoId: localStorage.getItem('bib_plano') || null, 
-    // Data de Início do plano (YYYY-MM-DD string)
-    startDate: localStorage.getItem('bib_startDate') || null, 
+    // Duração do plano (padrão 365)
+    planDuration: parseInt(localStorage.getItem('bib_duration')) || 365,
+    // Data de início do plano (Formato: YYYY-MM-DD)
+    planStartDate: localStorage.getItem('bib_start_date') || null,
     selectedMonth: 1,
     selectedDayOfMonth: null,
   };
@@ -563,50 +699,16 @@
     let s=0; for(let i=0;i<month-1;i++) s+=DAYS_PER_MONTH[i]; return s+day;
   }
 
-  // Calcula o número de dias decorridos desde a data de início
-  function getDaysSinceStart() {
-    if (!state.startDate) return 0;
-    // IMPORTANTE: Adiciona 'T00:00:00' para garantir que a data seja interpretada como local/UTC 00:00
-    const start = new Date(state.startDate + 'T00:00:00'); 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Zera hora para cálculo correto
-    
-    // Calcula a diferença em milissegundos
-    const diffTime = today - start;
-    // Converte para dias (Arredonda para baixo para considerar o dia de início como dia 1)
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    // Retorna o dia do plano esperado (Dia 1, Dia 2...)
-    return diffDays + 1; 
-  }
-  
-  // Encontra o PRIMEIRO dia não lido
-  function findNextUnreadDay() {
-      if (!state.planoId) return null;
-      // Procura do dia 1 ao 365
-      for (let day = 1; day <= 365; day++) {
-          const key = `${state.planoId}_day_${day}`;
-          if (!localStorage.getItem(key)) {
-              return day; // Este é o dia "META"
-          }
-      }
-      return 365; // Se tudo estiver lido, sugere o último dia
-  }
-
   // Alterna a visualização entre as duas "páginas"
   function showPage(pageId) {
       const selecao = document.getElementById('paginaSelecao');
       const plano = document.getElementById('paginaPlano');
       const texts = UI_TEXT[state.idioma];
 
-      // Atualiza textos da página de seleção
-      document.getElementById('tituloSelecao').innerText = texts.titulo_selecao;
-      document.getElementById('subtituloSelecao').innerText = texts.subtitulo_selecao;
-
       if (pageId === 'paginaPlano' && state.planoId) {
           // Exibir Página do Plano
-          selecao.classList.add('hidden'); 
-          plano.classList.remove('hidden'); 
+          selecao.classList.add('hidden'); // Usa 'hidden' para ocultar
+          plano.classList.remove('hidden'); // Usa 'hidden' para mostrar
           
           document.getElementById('tituloApp').innerText = ` ${texts.titulo}`;
           document.getElementById('subtituloApp').innerText = texts.subtitulo;
@@ -621,6 +723,7 @@
           plano.classList.add('hidden');
           selecao.classList.remove('hidden');
           
+          // ATUALIZAÇÃO DO HEADER (SEM REDUNDÂNCIA NO BODY)
           document.getElementById('tituloApp').innerText = ` ${texts.titulo_selecao}`;
           document.getElementById('subtituloApp').innerText = texts.subtitulo_selecao;
 
@@ -628,42 +731,6 @@
       }
       if(window.lucide) window.lucide.createIcons();
   }
-
-  // NOVO: Função para Iniciar/Selecionar um Plano (Chamada pelo botão "Iniciar Plano")
-  function startPlan(planId){
-    state.planoId = planId; 
-    localStorage.setItem('bib_plano', planId); 
-    
-    // Define a data de início para hoje se ainda não estiver definida (lógica do botão "Iniciar")
-    if(!state.startDate) {
-        const today = new Date().toISOString().split('T')[0];
-        state.startDate = today;
-        localStorage.setItem('bib_startDate', today);
-    } 
-    
-    showPage('paginaPlano');
-  }
-
-  // NOVO: Função para limpar o progresso e voltar à seleção (Chamada pelo modal de Aviso)
-  function fullPlanChange(){
-      if (!state.planoId) {
-          showPage('paginaSelecao');
-          return;
-      }
-      
-      // 1. Limpar progresso do plano anterior (dias lidos)
-      for(let day=1; day<=365; day++){
-          localStorage.removeItem(`${state.planoId}_day_${day}`);
-      }
-      
-      // 2. Limpar o ID do plano no estado e storage
-      state.planoId = null;
-      localStorage.removeItem('bib_plano');
-      
-      // 3. Navegar para a página de seleção
-      showPage('paginaSelecao');
-  }
-
 
   // ---------- RENDER FUNCTIONS ----------
   function renderPlanGrid(){
@@ -673,70 +740,84 @@
     container.innerHTML='';
     const texts = UI_TEXT[state.idioma].planos;
     const icons = ['calendar','clock','layers','heart','book-open','sun'];
-    
     texts.forEach((p, idx)=>{
+      const card = document.createElement('div'); // O card é um div, não um botão principal
       const isSelected = state.planoId===p.id;
-      const card = document.createElement('div');
-      
-      card.className='flex flex-col p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' +
+      // Usando flex-col justify-between para o botão ficar no final
+      card.className='plan-card flex flex-col justify-between p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' +
                     (isSelected ? 'bg-primary-500 text-white ring-4 ring-primary-500/50' : 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500');
-      card.style.minHeight='160px'; // Aumentado para caber o botão
-      
+      card.style.minHeight='180px'; 
+
       const iconColor = isSelected ? 'text-white' : 'text-primary-500';
       const descColor = isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400';
       const iconName = icons[idx] || 'book';
       
-      let cardContent = `\
-        <div class="mb-2"><i data-lucide="${iconName}" class="lucide w-8 h-8 ${iconColor}"></i></div>\
-        <div class="text-base font-bold">${p.title}</div>\
-        <div class="text-xs ${descColor} mt-1 flex-1">${p.desc}</div>`;
-      
-      // ** NOVO: Adiciona o botão INICIAR ou o status de Plano Atual **
-      if(!isSelected){
-         // Botão "Iniciar Plano" (o seu botão iniciar na seleção)
-         cardContent += `<button type="button" class="mt-4 w-full px-4 py-2 rounded-lg font-bold transition bg-primary-500 text-white hover:bg-primary-600 shadow-md" data-plan-id="${p.id}">
-             ${UI_TEXT[state.idioma].btn_iniciar_plano} 
-         </button>`;
-      } else {
-         // Se já selecionado, mostra o status
-         cardContent += `<div class="mt-4 w-full px-4 py-2 rounded-lg font-bold bg-meta-500 text-white shadow-md text-center">
-             ${UI_TEXT[state.idioma].plano_atual}
-         </div>`;
-      }
-
-      card.innerHTML = cardContent;
-      
-      // Adicionar listener ao botão INICIAR
-      const startButton = card.querySelector(`[data-plan-id="${p.id}"]`);
-      if(startButton){
-        startButton.onclick = () => startPlan(p.id);
-      }
+      card.innerHTML = `
+        <div>
+            <div class="mb-2"><i data-lucide="${iconName}" class="lucide w-8 h-8 ${iconColor}"></i></div>
+            <div class="text-base font-bold">${p.title}</div>
+            <div class="text-xs ${descColor} mt-1">${p.desc}</div>
+        </div>
+        <button id="btnStartPlan_${p.id}" data-plan-id="${p.id}" class="mt-4 px-4 py-2 rounded-xl font-semibold transition text-sm ${
+            isSelected 
+                ? 'bg-white text-primary-500 cursor-default opacity-80' 
+                : 'bg-primary-500 text-white hover:bg-primary-600'
+        }" ${isSelected ? 'disabled' : ''}>
+            ${isSelected ? 'Plano Ativo' : 'Iniciar Plano'}
+        </button>
+        `;
       
       container.appendChild(card);
+      
+      // Adiciona o listener APENAS ao botão "Iniciar Plano"
+      if(!isSelected){
+        document.getElementById(`btnStartPlan_${p.id}`).onclick = (e)=>{
+          e.stopPropagation(); // Previne clique no card, embora o card não tenha listener principal
+          state.planoId = p.id;
+          localStorage.setItem('bib_plano', p.id); 
+          
+          // Define a data de início como hoje ao iniciar o plano (Change 1)
+          const today = new Date();
+          const y = today.getFullYear();
+          const m = String(today.getMonth() + 1).padStart(2, '0');
+          const d = String(today.getDate()).padStart(2, '0');
+          state.planStartDate = `${y}-${m}-${d}`;
+          localStorage.setItem('bib_start_date', state.planStartDate);
+
+          showPage('paginaPlano');
+        };
+      }
     });
     if(window.lucide) window.lucide.createIcons();
   }
 
   function renderMonths(){
-    // ... (Mantido o mesmo)
     const div = document.getElementById('meses'); 
     if (!div) return;
     
     div.innerHTML='';
     const months = MONTHS[state.idioma];
-    months.forEach((m,i)=>{
-      const isSelected = state.selectedMonth === i+1;
-      const btn = document.createElement('button');
-      btn.className = 'flex-shrink-0 px-4 py-2 rounded-full font-semibold transition ' + 
-                      (isSelected ? 'bg-primary-500 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600');
-      btn.innerText = m;
-      btn.onclick = ()=>{ state.selectedMonth = i+1; renderMonths(); renderDays(i+1); };
-      div.appendChild(btn);
-    });
+    
+    // Calcula quantos meses são necessários para a duração atual (arredondando para cima)
+    const requiredMonths = Math.ceil(state.planDuration / 31); // 90 dias = 3 meses, 365 dias = 12 meses
+
+    for (let i = 0; i < 12; i++) {
+        // Se a duração for menor que 12 meses, só renderiza os meses necessários
+        if (state.planDuration < 365 && i >= requiredMonths) continue;
+
+        const m = months[i];
+        const monthIndex = i + 1; // 1 a 12
+        const isSelected = state.selectedMonth === monthIndex;
+        const btn = document.createElement('button');
+        btn.className = 'flex-shrink-0 px-4 py-2 rounded-full font-semibold transition ' + 
+                        (isSelected ? 'bg-primary-500 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600');
+        btn.innerText = m;
+        btn.onclick = ()=>{ state.selectedMonth = monthIndex; renderMonths(); renderDays(monthIndex); };
+        div.appendChild(btn);
+    }
     
     const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
     if(currentMonthButton){
-        // Scroll para o mês atual
         currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
@@ -750,187 +831,167 @@
     const startDayOfYear = monthDayToDayOfYear(month,1);
     const plan = getPlan(state.planoId, state.idioma);
     
-    // 1. Calcula os dias de referência para destaque
-    const today = new Date();
-    const todayMonth = today.getMonth() + 1;
-    const todayDayOfMonth = today.getDate();
+    // NOVO: Lógica de Data e Acompanhamento
+    let dayFromStart = null;
+    if (state.planStartDate) {
+        const startDate = new Date(state.planStartDate);
+        const today = new Date();
+        // Zera o tempo para contagem de dias exata
+        startDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        // Dias decorridos desde o início (1-indexado)
+        dayFromStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    }
     
-    const nextUnreadDay = findNextUnreadDay(); // Dia 1-365 que é a META
-    const expectedDay = getDaysSinceStart(); // Dia 1-365 esperado pelo Start Date
-
     for(let d=1; d<=daysInMonth; d++){
-      const dayOfYear = startDayOfYear + d -1; const idx = dayOfYear -1; const refs = plan[idx] || [];
-      const key = `${state.planoId}_day_${dayOfYear}`; const lido = localStorage.getItem(key);
+      const dayOfYear = startDayOfYear + d -1; 
+      const idx = dayOfYear -1; 
+      
+      const refs = plan[idx] || ['—']; 
+      
+      const key = `${state.planoId}_day_${dayOfYear}`; 
+      const lido = localStorage.getItem(key);
       const card = document.createElement('div');
       
-      // 2. Lógica dos destaques
-      const isToday = (month === todayMonth && d === todayDayOfMonth);
-      const isMetaDay = (dayOfYear === nextUnreadDay);
-      const isExpectedDay = state.startDate && (dayOfYear === expectedDay);
+      const dayBeingRendered = dayOfYear; // Dia do plano sendo renderizado (1 a Duração)
+      const isExpectedDay = state.planStartDate && dayBeingRendered === dayFromStart; 
       
-      let cardClasses = 'p-4 rounded-xl shadow-md border-t-2 cursor-pointer transition';
+      let cardClasses = 'p-4 rounded-xl shadow-md border-t-4 cursor-pointer transition';
       
-      if (lido) {
-        // Se lido, cor de fundo mais suave
-        cardClasses += ' border-primary-500 bg-gray-100 dark:bg-gray-700 opacity-90';
-      } else if (isMetaDay) {
-          cardClasses += ' next-day-highlight'; // META (Prioritário)
-      } else if (isToday) {
-          cardClasses += ' today-highlight'; // HOJE
+      // Se o dia do ano for maior que a duração do plano, não mostra leituras
+      const isOutsidePlanDuration = dayOfYear > state.planDuration;
+      const hasReadings = idx < state.planDuration && refs.some(r => r !== '—');
+
+      if (isOutsidePlanDuration) {
+          cardClasses += ' border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 cursor-default opacity-70';
+      } else if (isExpectedDay && hasReadings) { // Destaque para o dia 'Em Dia'
+          cardClasses += ' today-highlight border-primary-500'; 
       } else {
-          // Classes normais para dias passados/futuros
-          cardClasses += ' border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500' +
+          // Se LIDO, usa Borda Vermelha (ajustado de primary-500) e fundo cinza (read-highlight)
+          cardClasses += (lido ? ' border-red-500 opacity-90 read-highlight' : ' border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500') +
                          ' bg-white dark:bg-gray-800';
       }
-      
-      if (!lido && !isMetaDay && !isToday && isExpectedDay) {
-         cardClasses += ' border-dashed border-yellow-500/50';
-      }
-
 
       card.className = cardClasses;
       
-      const preview = refs.slice(0,2).join(', ');
-      
-      let iconName = 'chevrons-right'; 
-      let iconColor = isMetaDay ? 'text-meta-500' : 'text-gray-400 dark:text-gray-500';
+      const preview = hasReadings ? refs.slice(0,2).join(', ') : '—';
+      const iconName = lido ? 'check-circle' : (isOutsidePlanDuration ? 'minus' : 'chevrons-right');
+      const iconColor = lido ? 'text-red-500' : (isExpectedDay ? 'text-primary-500' : (isOutsidePlanDuration ? 'text-gray-400' : 'text-gray-400 dark:text-gray-500')); 
+      const textColor = isExpectedDay ? 'text-gray-800 dark:text-gray-100' : (isOutsidePlanDuration ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-200');
 
+      let statusHtml = '';
       if (lido) {
-        iconName = 'check-circle';
-        iconColor = 'text-primary-500'; // Azul para Concluído
-      } else if (isMetaDay) {
-        iconName = 'target'; 
-        iconColor = 'text-meta-600'; // Esmeralda para META
-      } else if (isToday) {
-        iconName = 'calendar-check';
-        iconColor = 'text-blue-500'; // Azul para HOJE
+        // Leitura Concluída
+        statusHtml = `<p class="text-xs font-bold text-red-500 mt-2">${UI_TEXT[state.idioma].lido}</p>`;
+      } else if (state.planStartDate && hasReadings) {
+        // Alerta de Atraso/Adiantado (TRADUZIDO)
+        const texts = UI_TEXT[state.idioma]; // Objeto de textos para tradução
+        
+        if (dayBeingRendered < dayFromStart) {
+            const diff = dayFromStart - dayBeingRendered;
+            // Atrasado: Texto vermelho
+            statusHtml = `<p class="text-xs font-bold text-red-500 mt-2">${texts.delayed} ${diff}${texts.days_behind}</p>`;
+        } else if (dayBeingRendered > dayFromStart) {
+            const diff = dayBeingRendered - dayFromStart;
+            // Adiantado: Texto verde
+            statusHtml = `<p class="text-xs font-bold text-green-500 mt-2">${texts.ahead} ${diff}${texts.days_ahead}</p>`;
+        }
       }
-
 
       card.innerHTML = `\
         <div class="flex justify-between items-start">\
           <div>\
-            <h3 class="text-xl font-extrabold ${isMetaDay ? 'text-meta-600 dark:text-meta-400' : 'text-primary-500'}">${d}</h3>\
-            <p class="text-xs ${isMetaDay ? 'text-meta-400 dark:text-meta-300' : 'text-gray-500 dark:text-gray-400'} font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
+            <h3 class="text-xl font-extrabold ${isExpectedDay ? 'text-primary-600 dark:text-primary-400' : 'text-primary-500'}">${d}</h3>\
+            <p class="text-xs ${isExpectedDay ? 'text-primary-400 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'} font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
           </div>\
           <div class="${iconColor} flex-shrink-0"><i data-lucide="${iconName}" class="lucide w-6 h-6"></i></div>\
         </div>\
-        <p class="mt-3 text-sm font-medium ${isMetaDay ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-200'}">${preview}${refs.length>2? ' ...' : ''}</p>`;
-      card.onclick = ()=> abrirModalForDay(dayOfYear);
+        ${statusHtml}
+        <p class="mt-3 text-sm font-medium ${textColor}">${preview}${refs.length>2 && hasReadings ? ' ...' : ''}</p>`;
+      
+      // O modal só deve abrir se houverem leituras programadas para aquele dia ou se estiver dentro da duração.
+      if (dayOfYear <= state.planDuration) {
+          card.onclick = ()=> abrirModalForDay(dayOfYear);
+      } else {
+          // Desabilita o cursor e clica se estiver fora do plano
+          card.style.cursor = 'default';
+          card.classList.remove('hover:shadow-lg', 'hover:ring-1', 'hover:ring-primary-500');
+          if (!isOutsidePlanDuration) { // Adicionado para evitar erro, mas não deve acontecer
+             card.innerHTML = `\
+                <div class="flex justify-between items-start">\
+                  <div>\
+                    <h3 class="text-xl font-extrabold text-gray-400">${d}</h3>\
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
+                  </div>\
+                  <div class="text-gray-400 flex-shrink-0"><i data-lucide="minus" class="lucide w-6 h-6"></i></div>\
+                </div>\
+                <p class="mt-3 text-sm font-medium text-gray-400">Fora do plano de ${state.planDuration} dias.</p>`;
+          }
+      }
+      
       container.appendChild(card);
     }
-    if(window.lucide) window.lucide.createIcons(); 
+    if(window.lucide) window.lucide.createIcons();
     updateProgressUI();
   }
 
   function formatDateSmall(month, day){ const months = MONTHS[state.idioma]; return `${months[month-1]} ${day}`; }
-  
-  // Função auxiliar para formatar a data (AAAA-MM-DD) para exibição (DD/MM/AAAA)
-  function formatDisplayDate(dateStr) {
-    if (!dateStr) return 'N/A';
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return dateStr;
-  }
 
   let modalCurrentDay = null;
-  let modalMode = 'leitura'; // 'leitura' ou 'config' ou 'reset' ou 'change_plan_warning'
   const modalDiv = document.getElementById('modal');
   const modalContent = document.getElementById('modalContent');
-  const modalLeituras = document.getElementById('modalLeituras');
-  const modalConfiguracao = document.getElementById('modalConfiguracao');
-  const modalBotoes = document.getElementById('modalBotoes');
-  const modalStatus = document.getElementById('modalStatus'); // NOVO: Elemento de status
-  const btnLido = document.getElementById('btnLido');
-  const btnLerAgora = document.getElementById('btnLerAgora');
-  const btnConfirmar = document.getElementById('btnConfirmar');
-  const btnCancelar = document.getElementById('btnCancelar');
-  const btnAcaoSecundaria = document.getElementById('btnAcaoSecundaria');
-  const inputDataInicio = document.getElementById('inputDataInicio');
 
+  function abrirModalForDay(dayOfYear){
+    if (!state.planoId) return;
+    modalCurrentDay = dayOfYear;
+    const plan = getPlan(state.planoId, state.idioma);
+    const refs = plan[dayOfYear-1] || [];
+    const key = `${state.planoId}_day_${dayOfYear}`;
+    const lido = localStorage.getItem(key);
+    
+    const hasReadings = refs.some(r => r !== '—');
 
-  // Função principal para abrir o modal
-  function abrirModal(mode){
-    modalMode = mode;
-    modalLeituras.classList.add('hidden');
-    modalConfiguracao.classList.add('hidden');
-    modalStatus.classList.add('hidden'); // Oculta o status por padrão
-    btnLido.classList.add('hidden');
-    btnLerAgora.classList.add('hidden');
-    btnConfirmar.classList.add('hidden');
-    btnCancelar.classList.add('hidden');
-    btnAcaoSecundaria.classList.add('hidden');
-    inputDataInicio.classList.add('hidden');
-    document.getElementById('modalMsg').innerHTML = '';
-    // Reseta a cor de fundo do modalContent para o padrão (para o caso de ser um dia lido)
-    modalContent.classList.remove('bg-gray-100', 'dark:bg-gray-700'); 
-
-    const texts = UI_TEXT[state.idioma];
-
-    if (mode === 'leitura') {
-        // Modo Leitura (chamado por abrirModalForDay)
-        modalLeituras.classList.remove('hidden');
-        btnLido.classList.remove('hidden');
-        btnLerAgora.classList.remove('hidden');
+    document.getElementById('modalTitulo').innerText = `${UI_TEXT[state.idioma].start} • ${UI_TEXT[state.idioma].dia_leitura} ${dayOfYear}`;
+    const ul = document.getElementById('modalLeituras'); ul.innerHTML = '';
+    
+    if (hasReadings) {
+        refs.forEach(r=>{
+          const li = document.createElement('li'); li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
+          const icon = document.createElement('i'); icon.setAttribute('data-lucide', 'book-open'); icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
+          const span = document.createElement('span'); span.innerText = r;
+          li.appendChild(icon);
+          li.appendChild(span);
+          ul.appendChild(li);
+        });
         
-        // Verifica se o dia atual está lido e atualiza o visual/texto
-        updateModalReadingState(modalCurrentDay);
-
-    } else if (mode === 'config') {
-        // Modo Configuração (Data de Início) - Contém o botão Reset/Limpeza
-        modalConfiguracao.classList.remove('hidden');
-        document.getElementById('modalTitulo').innerText = texts.configuracao;
-        document.getElementById('modalMsg').innerText = texts.btn_iniciar + ':'; // Texto "Definir Data de Início:"
-        
-        inputDataInicio.value = state.startDate || new Date().toISOString().split('T')[0];
-        inputDataInicio.classList.remove('hidden');
-        
-        btnConfirmar.innerText = texts.btn_salvar;
-        btnConfirmar.classList.remove('hidden');
-        btnCancelar.innerText = texts.cancelar;
-        btnCancelar.classList.remove('hidden');
-        
-        // Botão de Reset
-        btnAcaoSecundaria.innerText = texts.reset_plano;
-        btnAcaoSecundaria.classList.remove('hidden');
-        btnAcaoSecundaria.onclick = () => { fecharModal(); abrirModal('reset_warning'); }; 
-        btnConfirmar.onclick = handleModalConfirm; // Ação de Confirmação é Salvar
-        btnCancelar.onclick = fecharModal;
-
-    } else if (mode === 'reset_warning') {
-        // Modo Aviso de Reset (Limpeza de Cache com Alerta)
-        modalConfiguracao.classList.remove('hidden');
-        document.getElementById('modalTitulo').innerText = texts.reset_titulo;
-        document.getElementById('modalMsg').innerHTML = texts.reset_msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        btnConfirmar.innerText = texts.reset_confirmar;
-        btnConfirmar.classList.remove('hidden');
-        // AÇÃO DIRETA DE LIMPAR TUDO
-        btnConfirmar.onclick = () => { fecharModal(); resetApp(); }; 
-        
-        btnCancelar.innerText = texts.cancelar;
-        btnCancelar.classList.remove('hidden');
-        btnCancelar.onclick = fecharModal;
-
-    } else if (mode === 'change_plan_warning') {
-        // NOVO: Modo Aviso de Troca de Plano
-        modalConfiguracao.classList.remove('hidden');
-        document.getElementById('modalTitulo').innerText = texts.change_plan_titulo;
-        document.getElementById('modalMsg').innerHTML = texts.change_plan_msg.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        btnConfirmar.innerText = texts.change_plan_confirmar;
-        btnConfirmar.classList.remove('hidden');
-        // AÇÃO DIRETA DE TROCAR PLANO E RESETAR PROGRESSO
-        btnConfirmar.onclick = () => { fecharModal(); fullPlanChange(); }; 
-        
-        btnCancelar.innerText = texts.cancelar;
-        btnCancelar.classList.remove('hidden');
-        btnCancelar.onclick = fecharModal;
+        // Ativa os botões
+        document.getElementById('btnLido').disabled = false;
+        document.getElementById('btnLido').classList.remove('opacity-50', 'cursor-not-allowed');
+        document.getElementById('btnLerAgora').disabled = false;
+        document.getElementById('btnLerAgora').classList.remove('opacity-50', 'cursor-not-allowed');
+    } else {
+        ul.innerHTML = '<li class="text-base text-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700">Nenhuma leitura programada para este dia.</li>';
+        // Desativa os botões
+        document.getElementById('btnLido').disabled = true;
+        document.getElementById('btnLido').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('btnLerAgora').disabled = true;
+        document.getElementById('btnLerAgora').classList.add('opacity-50', 'cursor-not-allowed');
     }
     
-    // Configuração visual do modal (Fade-in)
+    // Atualiza o texto e estilo do botão "Lido"
+    const btnLido = document.getElementById('btnLido');
+    if (lido) {
+        btnLido.innerText = UI_TEXT[state.idioma].lido;
+        btnLido.classList.add('bg-green-500', 'hover:bg-green-600', 'shadow-green-500/30');
+        btnLido.classList.remove('bg-primary-500', 'hover:bg-primary-600', 'shadow-primary-500/30');
+    } else {
+        btnLido.innerText = UI_TEXT[state.idioma].nao_lido;
+        btnLido.classList.add('bg-primary-500', 'hover:bg-primary-600', 'shadow-primary-500/30');
+        btnLido.classList.remove('bg-green-500', 'hover:bg-green-600', 'shadow-green-500/30');
+    }
+    
+    document.getElementById('btnLerAgora').innerText = `📖 ${UI_TEXT[state.idioma].ler_agora}`;
+    
     modalDiv.classList.remove('hidden');
     setTimeout(()=>{
       modalDiv.style.opacity = '1';
@@ -939,136 +1000,36 @@
 
     if(window.lucide) window.lucide.createIcons();
   }
-  
-  // NOVO: Função para atualizar o estado visual do modal de leitura
-  function updateModalReadingState(dayOfYear) {
-      if (!state.planoId) return;
-      const key = `${state.planoId}_day_${dayOfYear}`;
-      const lido = localStorage.getItem(key);
-      const texts = UI_TEXT[state.idioma];
-
-      if (lido) {
-          // Se lido: Muda o fundo do modal, exibe status e muda o botão para desmarcar
-          modalContent.classList.add('bg-gray-100', 'dark:bg-gray-700'); 
-          modalStatus.innerText = texts.concluido;
-          modalStatus.classList.remove('hidden');
-          btnLido.innerText = texts.desmarcar;
-          btnLido.classList.remove('bg-primary-500', 'hover:bg-primary-600');
-          btnLido.classList.add('bg-red-600', 'hover:bg-red-700');
-      } else {
-          // Se não lido: Remove o fundo cinza, oculta status e muda o botão para marcar
-          modalContent.classList.remove('bg-gray-100', 'dark:bg-gray-700'); 
-          modalStatus.classList.add('hidden');
-          btnLido.innerText = texts.marcar;
-          btnLido.classList.remove('bg-red-600', 'hover:bg-red-700');
-          btnLido.classList.add('bg-primary-500', 'hover:bg-primary-600');
-      }
-  }
-
-
-  function abrirModalForDay(dayOfYear){
-    if (!state.planoId) return;
-    modalCurrentDay = dayOfYear;
-    const plan = getPlan(state.planoId, state.idioma);
-    const refs = plan[dayOfYear-1] || [];
-    document.getElementById('modalTitulo').innerText = `${UI_TEXT[state.idioma].start} • ${UI_TEXT[state.idioma].dia_leitura} ${dayOfYear}`;
-    
-    modalLeituras.innerHTML = '';
-    
-    refs.forEach(r=>{
-      const li = document.createElement('li'); li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
-      const icon = document.createElement('i'); icon.setAttribute('data-lucide', 'book-open'); icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
-      const span = document.createElement('span'); span.innerText = r;
-      li.appendChild(icon);
-      li.appendChild(span);
-      modalLeituras.appendChild(li);
-    });
-    
-    abrirModal('leitura');
-    // Chama a função para garantir o estado visual correto após a abertura
-    updateModalReadingState(dayOfYear); 
-  }
 
   function fecharModal(){
     modalDiv.style.opacity = '0';
     modalContent.classList.add('scale-95');
-    // Reinicia o onclick do botão confirmar para o padrão (Salvar Data de Início)
-    btnConfirmar.onclick = handleModalConfirm; 
     setTimeout(()=> modalDiv.classList.add('hidden'), 300); 
   }
 
-  // Lógica para marcar/desmarcar
+  document.getElementById('fecharModal').addEventListener('click', fecharModal);
+  
   document.getElementById('btnLido').addEventListener('click', ()=>{
-    if(!modalCurrentDay) return; 
+    if(!modalCurrentDay || document.getElementById('btnLido').disabled) return; 
     const key = `${state.planoId}_day_${modalCurrentDay}`; 
-    
-    // Toggle (Marcar/Desmarcar)
-    if(localStorage.getItem(key)) {
-        localStorage.removeItem(key); // Desmarcar
-    } else {
-        localStorage.setItem(key,'1'); // Marcar
-    }
-    
-    // Atualiza o estado do modal instantaneamente
-    updateModalReadingState(modalCurrentDay);
+    const lido = localStorage.getItem(key);
 
-    // Re-renderizar a grade de dias e o progresso
-    const { month } = dayOfYearToMonthDay(modalCurrentDay);
-    if (state.selectedMonth !== month) {
-      state.selectedMonth = month;
-      renderMonths();
+    if (lido) {
+        localStorage.removeItem(key); // Desmarca como lido
+    } else {
+        localStorage.setItem(key,'1'); // Marca como lido
     }
+    
+    fecharModal(); 
     renderDays(state.selectedMonth); 
     updateProgressUI();
   });
 
-  // Listener para o botão de Configuração/Iniciar (na página do plano)
-  document.getElementById('btnConfiguracao').addEventListener('click', () => {
-      if (!state.planoId) return;
-      btnConfirmar.onclick = handleModalConfirm; 
-      abrirModal('config');
-  });
-
-  // Ação de Confirmação (Salvar Data de Início)
-  function handleModalConfirm() {
-      if (modalMode === 'config') {
-          const newDate = inputDataInicio.value;
-          if (newDate) {
-              // Salva a data de início para a lógica de atraso/adiantamento
-              state.startDate = newDate;
-              localStorage.setItem('bib_startDate', newDate);
-              updateProgressUI(); // Atualiza UI com novo status
-              renderDays(state.selectedMonth); // Re-renderiza para atualizar destaques
-              fecharModal();
-          }
-      }
-  }
-  btnConfirmar.addEventListener('click', handleModalConfirm);
-  btnCancelar.addEventListener('click', fecharModal);
-
-
-  // Função para Resetar o Aplicativo (Limpeza de Cache Total)
-  function resetApp() {
-      for(let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key.startsWith('bib_') || key.includes('_day_')) { 
-              localStorage.removeItem(key);
-              i--; 
-          }
-      }
-      state.idioma = 'pt';
-      state.planoId = null;
-      state.startDate = null;
-      state.selectedMonth = 1;
-      location.reload(); 
-  }
-
-
   document.getElementById('btnLerAgora').addEventListener('click', ()=>{
-    if(!modalCurrentDay || !state.planoId) return; 
+    if(!modalCurrentDay || !state.planoId || document.getElementById('btnLerAgora').disabled) return; 
     const plan = getPlan(state.planoId, state.idioma); 
     const refs = plan[modalCurrentDay-1] || [];
-    if(refs.length===0) return;
+    if(refs.length===0 || refs.some(r=>r==='—')) return;
     const joinForSearch = refs.map(r=> r.replace(/\s+/g,' ')).join(',');
     const version = state.idioma==='pt' ? 'NVI-PT' : state.idioma==='en' ? 'NIV' : 'NIV';
     const url = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(joinForSearch)}&version=${version}`;
@@ -1080,83 +1041,45 @@
   function updateProgressUI(){
     if (!state.planoId) return;
       
-    const plan = getPlan(state.planoId, state.idioma);
-    const total = plan.length; let read=0;
-    for(let i=0;i<total;i++){ if(localStorage.getItem(`${state.planoId}_day_${i+1}`)) read++; }
+    // Usa a duração do estado (que é o tamanho do plano)
+    const total = state.planDuration;
+    let read=0;
+    for(let i=0;i<total;i++){ 
+        if(localStorage.getItem(`${state.planoId}_day_${i+1}`)) read++; 
+    }
     const pct = Math.round((read/total)*100);
     
     const progressoBar = document.getElementById('progressoBar');
     const textoProgresso = document.getElementById('textoProgresso');
     const textoPlanoAtual = document.getElementById('textoPlanoAtual');
-    const textoDataInicio = document.getElementById('textoDataInicio');
-    const btnMeta = document.getElementById('btnMeta');
-    const btnConfiguracao = document.getElementById('btnConfiguracao'); 
+    const textoDataInicio = document.getElementById('textoDataInicio'); // Elemento da data
 
     if (progressoBar) progressoBar.style.width = pct + '%';
+    // O total é baseado na DURAÇÃO
     if (textoProgresso) textoProgresso.innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}`;
     
     const planoEncontrado = UI_TEXT[state.idioma].planos.find(p=>p.id===state.planoId);
     const planName = planoEncontrado ? planoEncontrado.title : '---';
-      
-    const trocarPlanoLink = document.getElementById('trocarPlanoLink');
-    if (trocarPlanoLink) trocarPlanoLink.querySelector('span').innerText = `${UI_TEXT[state.idioma].plano}: ${planName} • ${UI_TEXT[state.idioma].link_trocar}`;
+    
+    // Atualiza o texto do display estático
+    if (textoPlanoAtual) textoPlanoAtual.innerHTML = `${UI_TEXT[state.idioma].plano}: ${planName} (${total}d)`;
 
-    // Atualiza Data de Início e Status de Atraso/Botão Configuração
-    if (textoDataInicio && btnConfiguracao) {
-        if (state.startDate) {
-            // Lógica de Atraso/Adiantamento
-            const expectedDay = getDaysSinceStart();
-            const nextUnreadDay = findNextUnreadDay();
-            const diff = expectedDay - nextUnreadDay; // > 0: Atrasado, 0: Em dia, < 0: Adiantado
+    // Atualiza a data de início
+    if (textoDataInicio && state.planStartDate) {
+        // Formata YYYY-MM-DD para o formato local (ex: DD/MM/YYYY)
+        const dateParts = state.planStartDate.split('-');
+        const texts = UI_TEXT[state.idioma];
+        
+        // Usa o formato PT/BR (DD/MM/YYYY) se o idioma for PT, senão usa EN/US (MM/DD/YYYY)
+        const formattedDate = state.idioma === 'pt' 
+            ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` 
+            : `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
 
-            let statusText = '';
-            if (diff > 0) {
-                statusText = UI_TEXT[state.idioma].status_atraso.replace('{dias}', diff);
-            } else if (diff === 0) {
-                statusText = UI_TEXT[state.idioma].status_emdia;
-            } else {
-                statusText = UI_TEXT[state.idioma].status_adiantado.replace('{dias}', Math.abs(diff));
-            }
-            
-            // Texto principal da data
-            const inicio = UI_TEXT[state.idioma].data_inicio;
-            const dataFmt = formatDisplayDate(state.startDate);
-            textoDataInicio.innerHTML = `${inicio}: <strong>${dataFmt}</strong><br><span class="text-xs text-gray-500 dark:text-gray-400">${statusText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>`;
-
-            // Botão: Configurações do Plano
-            btnConfiguracao.innerHTML = `<i data-lucide="settings" class="lucide w-4 h-4 mr-1"></i><span id="textoConfiguracao">${UI_TEXT[state.idioma].configuracao}</span>`;
-            
-
-            // Habilita o botão META
-            if(btnMeta) btnMeta.disabled = false;
-
-        } else {
-            // Texto: Data de Início não definida
-            textoDataInicio.innerText = `${UI_TEXT[state.idioma].data_inicio}: ${UI_TEXT[state.idioma].nao_definido}`;
-            
-            // ** BOTÃO INICIAR (Definir Data de Início) **
-            btnConfiguracao.innerHTML = `<i data-lucide="calendar-check" class="lucide w-4 h-4 mr-1"></i><span id="textoConfiguracao">${UI_TEXT[state.idioma].btn_iniciar}</span>`;
-            
-             // Desabilita o botão META
-            if(btnMeta) btnMeta.disabled = true;
-        }
+        textoDataInicio.innerText = `${texts.start_date_label}: ${formattedDate}`;
+    } else if (textoDataInicio) {
+        textoDataInicio.innerText = '';
     }
-    if(window.lucide) window.lucide.createIcons();
   }
-
-  // NOVO: EVENTO DO LINK "TROCAR PLANO" - Com Aviso
-  document.addEventListener('click', (e) => {
-      if (e.target && e.target.id === 'trocarPlanoLink' || e.target.closest('#trocarPlanoLink')) {
-          e.preventDefault();
-          // Se já existe plano, abre o modal de aviso antes de prosseguir
-          if(state.planoId) {
-              abrirModal('change_plan_warning');
-          } else {
-              // Se não há plano, apenas navega
-              showPage('paginaSelecao');
-          }
-      }
-  });
 
 
   // ---------- IDIOMA DROPDOWN LOGIC ----------
@@ -1169,8 +1092,10 @@
     const texts = UI_TEXT[lang];
     const flagCode = texts.flag_code;
 
+    // Atualiza o botão principal APENAS com a bandeira
     currentFlag.className = `flag-icon flag-icon-${flagCode}`;
     
+    // Altera o estado de 'selecionado' no menu
     idiomaItems.forEach(item => {
         if(item.getAttribute('data-lang') === lang) {
             item.classList.add('bg-gray-200', 'dark:bg-gray-600');
@@ -1213,48 +1138,298 @@
           if (newLang !== state.idioma) {
               state.idioma = newLang; 
               localStorage.setItem('bib_idioma', state.idioma);
+              CACHE = {}; // Limpa o cache para recarregar os planos com os nomes no novo idioma
               updateIdiomaDisplay(state.idioma);
           }
           toggleIdiomaMenu();
       });
   });
 
-  // Função centralizada de atualização de texto
+  // Função centralizada de atualização de texto E TRADUÇÃO DO BOTÃO HOJE
   function updateUITexts(lang){
+    const texts = UI_TEXT[lang];
+      
+    // Redireciona para a página correta após a mudança de idioma
     showPage(state.planoId ? 'paginaPlano' : 'paginaSelecao');
 
-    const btnMetaText = document.getElementById('btnMetaText');
-    if (btnMetaText) {
-        btnMetaText.innerText = UI_TEXT[lang].meta;
+    // ATUALIZAÇÃO DO BOTÃO HOJE
+    const btnHojeText = document.getElementById('btnHojeText');
+    if (btnHojeText) {
+        btnHojeText.innerText = texts.hoje;
+    }
+    
+    // ATUALIZAÇÃO DOS NOVOS LINKS DE AJUDA
+    const linkPrivacidade = document.getElementById('linkPrivacidade');
+    const btnAbrirGlossario = document.getElementById('btnAbrirGlossario');
+    if (linkPrivacidade) linkPrivacidade.innerText = texts.privacy_link;
+    if (btnAbrirGlossario) btnAbrirGlossario.innerText = texts.glossary_link;
+
+    // ATUALIZAÇÃO DO NOVO MODAL DE CONFIRMAÇÃO
+    const modal = document.getElementById('confirmChangePlanModal');
+    if (modal && !modal.classList.contains('hidden')) { // Se o modal estiver aberto, atualiza o texto imediatamente
+        document.getElementById('confirmTitle').innerText = texts.alert_title || 'Atenção!';
+        document.getElementById('confirmMessage').innerHTML = texts.alert_change_plan_html;
+        document.getElementById('btnCancelChangePlan').innerText = texts.cancel;
+        document.getElementById('btnConfirmChangePlan').innerText = texts.confirm_erase;
     }
   }
 
-  // Navega para o mês da META e destaca o dia META (Próximo Dia Pendente)
-  function goToMeta() {
-      if (!state.planoId || !state.startDate) {
-          return;
-      }
+  // NOVA FUNÇÃO: Navega para o mês atual e destaca o dia atual
+  function goToToday() {
+      if (!state.planoId) return;
 
-      const nextUnreadDay = findNextUnreadDay();
-      if (!nextUnreadDay) return; 
-
-      const { month } = dayOfYearToMonthDay(nextUnreadDay);
+      const today = new Date();
+      const currentMonth = today.getMonth() + 1; 
       
-      if (state.selectedMonth !== month) {
-          state.selectedMonth = month;
+      if (state.selectedMonth !== currentMonth) {
+          state.selectedMonth = currentMonth;
       }
       
       renderMonths();
       renderDays(state.selectedMonth);
       
-      const dayOfMonth = nextUnreadDay - monthDayToDayOfYear(month, 1) + 1;
-      const targetCard = document.querySelector(`#dias > div:nth-child(${dayOfMonth})`);
-      
-      if (targetCard) {
-          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const mesesContainer = document.getElementById('meses');
+      const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
+      if (mesesContainer && currentMonthButton) {
+          currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
   }
+  
+  function clearPlanStorage(){
+      // Limpa as chaves de configuração do plano
+      localStorage.removeItem('bib_plano');
+      localStorage.removeItem('bib_duration');
+      localStorage.removeItem('bib_start_date');
 
+      // Limpa todas as chaves de progresso do plano anterior (mais seguro que usar o ID)
+      const keysToRemove = [];
+      for(let i=0; i<localStorage.length; i++){
+          const key = localStorage.key(i);
+          if(key.includes('_day_')){
+              keysToRemove.push(key);
+          }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Reseta o estado
+      state.planoId = null;
+      state.planDuration = 365;
+      state.planStartDate = null;
+      CACHE = {};
+  }
+
+
+  // NOVO: LÓGICA DO MODAL DE CONFIGURAÇÕES
+  const settingsModal = document.getElementById('settingsModal');
+  const planDurationSelect = document.getElementById('planDurationSelect');
+
+  function openSettingsModal(){
+      const texts = UI_TEXT[state.idioma];
+
+      // Atualiza textos do modal
+      document.getElementById('settingsModalTitle').innerText = texts.settings;
+      document.querySelector('label[for="planDurationSelect"]').innerText = texts.duration_label;
+      document.getElementById('btnTrocarPlano').innerText = texts.link_trocar;
+      document.getElementById('btnResetarProgresso').innerText = texts.reset_progress;
+      document.getElementById('backupRestoreTitle').innerText = texts.backup_restore;
+      document.getElementById('btnExport').innerText = texts.export_progress;
+      document.getElementById('btnImport').innerText = texts.import_progress;
+      document.getElementById('durationWarning').innerText = texts.alert_duration_change;
+
+
+      // Preenche o seletor de duração
+      planDurationSelect.innerHTML = DURATIONS.map(d => 
+          `<option value="${d}">${texts.duration_options[d] || d + ' Days'}</option>`
+      ).join('');
+      // Seleciona o valor atual
+      planDurationSelect.value = state.planDuration.toString();
+
+      settingsModal.classList.remove('hidden');
+      setTimeout(() => {
+          settingsModal.style.opacity = '1';
+          document.getElementById('settingsModalContent').classList.remove('scale-95');
+      }, 10);
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closeSettingsModal(){
+      settingsModal.style.opacity = '0';
+      document.getElementById('settingsModalContent').classList.add('scale-95');
+      setTimeout(() => settingsModal.classList.add('hidden'), 300);
+  }
+  
+  // NOVO: LÓGICA DO MODAL DE GLOSSÁRIO
+  const glossaryModal = document.getElementById('glossaryModal');
+  
+  function openGlossaryModal(){
+      const texts = UI_TEXT[state.idioma];
+
+      // Atualiza o título do modal
+      document.getElementById('glossaryModalTitle').innerText = texts.glossary_link; 
+
+      glossaryModal.classList.remove('hidden');
+      setTimeout(() => {
+          glossaryModal.style.opacity = '1';
+          document.getElementById('glossaryModalContent').classList.remove('scale-95');
+      }, 10);
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closeGlossaryModal(){
+      glossaryModal.style.opacity = '0';
+      document.getElementById('glossaryModalContent').classList.add('scale-95');
+      setTimeout(() => glossaryModal.classList.add('hidden'), 300);
+  }
+
+  // Handler: Duração do Plano
+  planDurationSelect.addEventListener('change', (e) => {
+      const newDuration = parseInt(e.target.value);
+      if (newDuration !== state.planDuration) {
+          state.planDuration = newDuration;
+          localStorage.setItem('bib_duration', newDuration);
+          CACHE = {}; // Invalida o cache para gerar o novo plano
+          closeSettingsModal();
+          showPage('paginaPlano'); // Re-renderiza o plano com a nova duração
+      }
+  });
+
+  // --- Funções do Novo Modal de Confirmação (Estiloso) ---
+  const confirmChangePlanModal = document.getElementById('confirmChangePlanModal');
+  const confirmChangePlanContent = document.getElementById('confirmChangePlanContent');
+
+  function openConfirmChangePlanModal() {
+      const texts = UI_TEXT[state.idioma];
+
+      document.getElementById('confirmTitle').innerText = texts.alert_title || 'Atenção!';
+      document.getElementById('confirmMessage').innerHTML = texts.alert_change_plan_html; 
+      document.getElementById('btnCancelChangePlan').innerText = texts.cancel;
+      document.getElementById('btnConfirmChangePlan').innerText = texts.confirm_erase;
+
+      confirmChangePlanModal.classList.remove('hidden');
+      setTimeout(() => {
+          confirmChangePlanModal.style.opacity = '1';
+          confirmChangePlanContent.classList.remove('scale-95');
+      }, 10);
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closeConfirmChangePlanModal() {
+      confirmChangePlanModal.style.opacity = '0';
+      confirmChangePlanContent.classList.add('scale-95');
+      setTimeout(() => confirmChangePlanModal.classList.add('hidden'), 300);
+  }
+
+  // Handler: Trocar Plano (MODIFICADO para abrir o modal customizado)
+  document.getElementById('btnTrocarPlano').addEventListener('click', () => {
+      closeSettingsModal(); // Fecha o modal de configurações primeiro
+      openConfirmChangePlanModal(); // Abre o novo modal de confirmação
+  });
+
+  // Handler: Cancelar a troca de plano no modal customizado
+  document.getElementById('btnCancelChangePlan').addEventListener('click', () => {
+      closeConfirmChangePlanModal();
+  });
+  
+  // Handler: Confirmar a troca de plano no modal customizado
+  document.getElementById('btnConfirmChangePlan').addEventListener('click', () => {
+      clearPlanStorage(); // ZERA O CACHE!
+      closeConfirmChangePlanModal();
+      showPage('paginaSelecao');
+  });
+
+  document.getElementById('confirmChangePlanModal').addEventListener('click', (e) => { 
+      if(e.target.id === 'confirmChangePlanModal') closeConfirmChangePlanModal(); 
+  });
+
+
+  // Handler: Resetar Progresso
+  document.getElementById('btnResetarProgresso').addEventListener('click', () => {
+      if (confirm(UI_TEXT[state.idioma].alert_reset)) {
+          const totalDays = state.planDuration;
+          // Limpa apenas os itens de progresso do plano atual
+          for (let i = 1; i <= totalDays; i++) {
+              localStorage.removeItem(`${state.planoId}_day_${i}`);
+          }
+          // Opcional: limpa a data de início se o plano for resetado
+          localStorage.removeItem('bib_start_date');
+          state.planStartDate = null;
+
+          closeSettingsModal();
+          showPage('paginaPlano'); // Re-renderiza a página para mostrar o progresso zerado
+      }
+  });
+
+
+  // Handler: Exportar Progresso
+  function exportProgress() {
+      const data = {};
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+          // Filtra apenas os dados de progresso e configurações relevantes
+          if (key.startsWith('bib_') || key.includes('_day_')) {
+              data[key] = localStorage.getItem(key);
+          }
+      });
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `bible_plan_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+  }
+  document.getElementById('btnExport').addEventListener('click', exportProgress);
+
+
+  // Handler: Importar Progresso
+  function importProgress() {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'application/json';
+      fileInput.style.display = 'none';
+
+      fileInput.onchange = e => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function(event) {
+              try {
+                  const importedData = JSON.parse(event.target.result);
+                  
+                  // Limpa o localStorage de dados de plano e configurações relevantes antes de importar
+                  const keysToClear = Object.keys(localStorage).filter(key => key.startsWith('bib_') || key.includes('_day_'));
+                  keysToClear.forEach(key => localStorage.removeItem(key));
+
+                  // Importa os novos dados
+                  for (const key in importedData) {
+                      localStorage.setItem(key, importedData[key]);
+                  }
+
+                  // Atualiza o estado global com os novos dados
+                  state.idioma = localStorage.getItem('bib_idioma') || 'pt';
+                  state.planoId = localStorage.getItem('bib_plano') || null;
+                  state.planDuration = parseInt(localStorage.getItem('bib_duration')) || 365;
+                  state.planStartDate = localStorage.getItem('bib_start_date') || null;
+
+                  closeSettingsModal();
+                  alert(UI_TEXT[state.idioma].alert_import_success);
+                  location.reload(); 
+
+              } catch (error) {
+                  console.error("Erro durante a importação:", error);
+                  alert(UI_TEXT[state.idioma].alert_import_error);
+              }
+          };
+          reader.readAsText(file);
+      };
+
+      document.body.appendChild(fileInput);
+      fileInput.click();
+      fileInput.remove();
+  }
+  document.getElementById('btnImport').addEventListener('click', importProgress);
 
   // ---------- INITIALIZE APP ----------
   function init(){
@@ -1262,12 +1437,33 @@
     state.planoId = localStorage.getItem('bib_plano');
     state.selectedMonth = state.selectedMonth || (today.getMonth()+1);
     
+    // 1. Inicializa o display do idioma, o que chama updateUITexts
     updateIdiomaDisplay(state.idioma);
     
-    const btnMeta = document.getElementById('btnMeta');
-    if (btnMeta) {
-        btnMeta.addEventListener('click', goToMeta);
+    // 2. Adiciona o listener para o novo botão Hoje
+    const btnHoje = document.getElementById('btnHoje');
+    if (btnHoje) {
+        btnHoje.addEventListener('click', goToToday);
     }
+    
+    // 3. Adiciona o listener para o novo botão Configurações
+    document.getElementById('btnOpenSettings').addEventListener('click', openSettingsModal);
+    document.getElementById('settingsModal').addEventListener('click', (e) => { 
+        if(e.target.id === 'settingsModal') closeSettingsModal(); 
+    });
+    
+    // 4. Adiciona o listener para o botão de Glossário
+    document.getElementById('btnAbrirGlossario').addEventListener('click', openGlossaryModal);
+    document.getElementById('fecharGlossaryModal').addEventListener('click', closeGlossaryModal);
+    document.getElementById('glossaryModal').addEventListener('click', (e) => { 
+        if(e.target.id === 'glossaryModal') closeGlossaryModal(); 
+    });
+    
+    // 5. Adiciona o listener ao link de privacidade (Apenas um placeholder para um link real)
+    document.getElementById('linkPrivacidade').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Aqui você colocaria o link ou o conteúdo da Política de Privacidade. O Plano Bíblico é 100% armazenado localmente no seu navegador e não coleta dados.');
+    });
   }
   
   // Executa a inicialização após o DOM carregar
@@ -1300,7 +1496,7 @@
       // 2. Adiciona listener ao botão de tema
       if(btnTema) btnTema.addEventListener('click', toggleTheme);
 
-      // --- Inicialização Principal (inclui o listener do botão Meta) ---
+      // --- Inicialização Principal ---
       init();
   });
   </script>
