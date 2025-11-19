@@ -46,7 +46,6 @@
     
     /* Ajuste para o tamanho da bandeira */
     .flag-icon { width: 1.5rem; height: 1.5rem; }
-    .idioma-item .flag-icon { margin-right: 0.5rem; }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col font-sans">
@@ -63,24 +62,20 @@
 
       <div class="flex items-center gap-2">
         <div id="idiomaDropdown" class="relative">
-            <button id="idiomaToggle" class="px-3 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium flex items-center gap-2" aria-label="Alterar idioma">
+            <button id="idiomaToggle" class="px-3 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium flex items-center justify-center gap-1" aria-label="Alterar idioma">
                 <span id="currentFlag" class="flag-icon"></span>
-                <span id="currentLangText">Português</span>
-                <i data-lucide="chevron-down" class="lucide w-4 h-4 ml-1"></i>
+                <i data-lucide="chevron-down" class="lucide w-4 h-4"></i>
             </button>
 
-            <div id="idiomaMenu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-xl shadow-2xl py-1 z-10 hidden ring-1 ring-black ring-opacity-5 origin-top-right transition-all duration-150 transform scale-95 opacity-0">
-                <button class="idioma-item w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2" data-lang="pt">
+            <div id="idiomaMenu" class="absolute right-0 mt-2 w-20 bg-white dark:bg-gray-700 rounded-xl shadow-2xl py-1 z-10 hidden ring-1 ring-black ring-opacity-5 origin-top-right transition-all duration-150 transform scale-95 opacity-0">
+                <button class="idioma-item w-full text-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center" data-lang="pt">
                     <span class="flag-icon flag-icon-br"></span>
-                    <span>Português</span>
                 </button>
-                <button class="idioma-item w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2" data-lang="en">
+                <button class="idioma-item w-full text-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center" data-lang="en">
                     <span class="flag-icon flag-icon-us"></span>
-                    <span>English</span>
                 </button>
-                <button class="idioma-item w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2" data-lang="es">
+                <button class="idioma-item w-full text-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center justify-center" data-lang="es">
                     <span class="flag-icon flag-icon-es"></span>
-                    <span>Español</span>
                 </button>
             </div>
         </div>
@@ -399,6 +394,7 @@
 
   // ---------- UI & STATE ----------
   let state = {
+    // Carrega o idioma e o plano do localStorage ou usa o padrão 'pt'/'tradicional'
     idioma: localStorage.getItem('bib_idioma') || 'pt',
     planoId: localStorage.getItem('bib_plano') || 'tradicional',
     selectedMonth: 1,
@@ -434,12 +430,14 @@
         <div class="text-base font-bold">${p.title}</div>\
         <div class="text-xs ${descColor} mt-1">${p.desc}</div>`;
       btn.onclick = ()=>{
-        state.planoId = p.id; localStorage.setItem('bib_plano', p.id);
+        state.planoId = p.id; 
+        // SALVA O PLANO NO LOCAL STORAGE
+        localStorage.setItem('bib_plano', p.id); 
         renderPlanGrid(); renderMonths(); renderDays(state.selectedMonth); updateProgressUI();
       };
       container.appendChild(btn);
     });
-    // Chamada Lucide (necessária apenas para os ícones do corpo do app, não interfere no botão de tema)
+    // Chamada Lucide 
     if(window.lucide) window.lucide.createIcons();
   }
 
@@ -492,7 +490,7 @@
       card.onclick = ()=> abrirModalForDay(dayOfYear);
       container.appendChild(card);
     }
-    // Chamada Lucide (necessária apenas para os ícones do corpo do app)
+    // Chamada Lucide 
     if(window.lucide) window.lucide.createIcons(); updateProgressUI();
   }
 
@@ -570,20 +568,20 @@
     document.getElementById('textoPlanoAtual').innerText = `${UI_TEXT[state.idioma].plano}: ${planName}`;
   }
 
-  // ---------- IDIOMA DROPDOWN LOGIC ----------
+  // ---------- IDIOMA DROPDOWN LOGIC (SIMPLIFICADO) ----------
   const idiomaToggle = document.getElementById('idiomaToggle');
   const idiomaMenu = document.getElementById('idiomaMenu');
   const currentFlag = document.getElementById('currentFlag');
-  const currentLangText = document.getElementById('currentLangText');
+  // const currentLangText = document.getElementById('currentLangText'); // Removido
   const idiomaItems = document.querySelectorAll('.idioma-item');
 
   function updateIdiomaDisplay(lang){
     const texts = UI_TEXT[lang];
     const flagCode = texts.flag_code;
 
-    // Atualiza o botão principal
+    // Atualiza o botão principal APENAS com a bandeira
     currentFlag.className = `flag-icon flag-icon-${flagCode}`;
-    currentLangText.innerText = texts.lang_name;
+    // currentLangText.innerText = texts.lang_name; // Removido
     
     // Altera o estado de 'selecionado' no menu
     idiomaItems.forEach(item => {
@@ -640,6 +638,7 @@
     document.getElementById('tituloApp').innerText = texts.titulo;
     document.getElementById('subtituloApp').innerText = texts.subtitulo;
     
+    // O renderPlanGrid usa state.planoId (que é persistido) para destacar o plano correto
     renderPlanGrid(); 
     renderMonths(); 
     renderDays(state.selectedMonth); 
@@ -652,7 +651,7 @@
     const today = new Date(); 
     state.selectedMonth = state.selectedMonth || (today.getMonth()+1);
     
-    // Inicializa o display do idioma, que por sua vez chama updateUITexts
+    // Inicializa o display do idioma, que por sua vez chama updateUITexts e renderiza o plano correto.
     updateIdiomaDisplay(state.idioma);
   }
   init();
