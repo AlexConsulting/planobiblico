@@ -75,7 +75,7 @@
     }
     
     /* Ajuste para o scroll suave no modal de configurações */
-    #settingsModalContent, #glossaryModalContent { max-height: 90vh; overflow-y: auto; }
+    #settingsModalContent, #glossaryModalContent, #privacyModalContent { max-height: 90vh; overflow-y: auto; }
 
   </style>
 </head>
@@ -86,7 +86,7 @@
       <div class="flex items-center gap-3">
         <div class="rounded-xl bg-primary-500 text-white w-10 h-10 flex items-center justify-center text-xl font-extrabold shadow-md">B</div>
         <div>
-          <h1 id="tituloApp" class="text-xl font-bold">📅 Plano de Leitura Bíblica</h1>
+          <h1 id="tituloApp" class="text-xl font-bold">Plano de Leitura Bíblica</h1>
           <p id="subtituloApp" class="text-sm text-gray-600 dark:text-gray-400">Escolha um plano e comece hoje</p>
         </div>
       </div>
@@ -242,56 +242,31 @@
   </div>
 </div>
 
+<div id="privacyModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+    <div id="privacyModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-lg shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-2xl font-extrabold text-primary-500" id="privacyModalTitle"></h3>
+            <button id="fecharPrivacyModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="x" class="lucide w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div id="privacyContentArea" class="space-y-4 text-gray-700 dark:text-gray-300">
+            </div>
+    </div>
+</div>
+
 <div id="glossaryModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
     <div id="glossaryModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-lg shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-start mb-4">
-            <h3 class="text-2xl font-extrabold text-primary-500" id="glossaryModalTitle">Glossário / Ajuda</h3>
+            <h3 class="text-2xl font-extrabold text-primary-500" id="glossaryModalTitle"></h3>
             <button id="fecharGlossaryModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <i data-lucide="x" class="lucide w-6 h-6"></i>
             </button>
         </div>
         
-        <div class="space-y-4 text-gray-700 dark:text-gray-300">
-            <h4 class="text-lg font-bold text-primary-500">Funcionalidades Principais</h4>
-            <ul class="space-y-3">
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="calendar" class="lucide w-5 h-5 text-primary-500"></i></span>
-                    <p><strong>Plano Ativo (Círculo Azul)</strong>: Indica o plano de leitura que está em uso no momento.</p>
-                </li>
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0">📅</span>
-                    <p><strong>Botão HOJE</strong>: Redireciona rapidamente a visualização para o mês e dia da leitura que deveria ser feita hoje.</p>
-                </li>
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0">⚙️</span>
-                    <p><strong>Configurações</strong>: Permite alterar a duração do plano (1 ano, 6 meses, 3 meses), resetar o progresso ou trocar de plano.</p>
-                </li>
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0">📖</span>
-                    <p><strong>Botão "Ler agora"</strong>: Abre os versículos de leitura em uma nova aba no Bible Gateway, na versão (NVI-PT/NIV) correspondente ao idioma da aplicação.</p>
-                </li>
-            </ul>
-            
-            <h4 class="text-lg font-bold text-primary-500 pt-4 border-t border-gray-200 dark:border-gray-700">Ícones nos Dias de Leitura</h4>
-            <ul class="space-y-3">
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="check-circle" class="lucide w-5 h-5 text-red-500"></i></span>
-                    <p><strong>Dia Concluído</strong>: O dia foi marcado como lido (fundo cinza claro e ícone vermelho).</p>
-                </li>
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="chevrons-right" class="lucide w-5 h-5 text-gray-400"></i></span>
-                    <p><strong>Dia Não Lido (Pendente)</strong>: Leitura ainda não marcada como lida.</p>
-                </li>
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0"><i data-lucide="star" class="lucide w-5 h-5 text-primary-500 fill-primary-500/50"></i></span>
-                    <p><strong>Dia Atual/Em Dia (Borda Azul Grossa)</strong>: Marca o dia de leitura esperado (o dia que você está hoje no plano).</p>
-                </li>
-                <li class="flex items-start">
-                    <span class="mr-3 mt-1 flex-shrink-0">📊</span>
-                    <p><strong>Status de Acompanhamento</strong>: Textos como "Atrasado (X dias)" ou "Adiantado (Y dias)" aparecem se houver uma data de início definida, indicando sua posição em relação ao progresso esperado.</p>
-                </li>
-            </ul>
-        </div>
+        <div id="glossaryContentArea" class="space-y-4 text-gray-700 dark:text-gray-300">
+            </div>
     </div>
 </div>
 
@@ -358,9 +333,36 @@
       alert_change_plan_html: 'Trocar de plano irá **apagar todo o seu progresso atual** (dias marcados e data de início). Deseja continuar?', 
       cancel: 'Cancelar', 
       confirm_erase: 'Sim, Apagar Histórico', 
+      
       // NOVO: Textos para Links Adicionais
       privacy_link: 'Privacidade (LGPD)',
       glossary_link: 'Glossário / Ajuda',
+
+      // NOVO: Textos de Privacidade
+      privacy_title: 'Privacidade (LGPD)',
+      privacy_p1: 'Nenhum dado é enviado, armazenado ou acessado por servidores externos ou pelo desenvolvedor. O único armazenamento ocorre localmente no seu dispositivo (se você usar a função \'Exportar Progresso JSON\').',
+      
+      // NOVO: Textos para Botão de Iniciar/Ver Plano
+      start_plan_button: 'Começar Plano', // NOVO
+      active_plan: 'Plano Ativo', // NOVO
+      view_plan: 'Ver Plano', // NOVO
+      
+      // NOVO: Textos do Glossário (Movidos do HTML)
+      glossary_title: 'Glossário / Ajuda',
+      glossary_features_title: 'Funcionalidades Principais',
+      glossary_features: [
+          { icon: 'calendar', text: '<strong>Plano Ativo (Círculo Azul)</strong>: Indica o plano de leitura que está em uso no momento.' },
+          { icon: '📅', text: '<strong>Botão HOJE</strong>: Redireciona rapidamente a visualização para o mês e dia da leitura que deveria ser feita hoje.' },
+          { icon: '⚙️', text: '<strong>Configurações</strong>: Permite alterar a duração do plano (1 ano, 6 meses, 3 meses), resetar o progresso ou trocar de plano.' },
+          { icon: '📖', text: '<strong>Botão "Ler agora"</strong>: Abre os versículos de leitura em uma nova aba no Bible Gateway, na versão (NVI-PT/NIV) correspondente ao idioma da aplicação.' }
+      ],
+      glossary_icons_title: 'Ícones nos Dias de Leitura',
+      glossary_icons: [
+          { icon: 'check-circle', text: '<strong>Dia Concluído</strong>: O dia foi marcado como lido (fundo cinza claro e ícone vermelho).' },
+          { icon: 'chevrons-right', text: '<strong>Dia Não Lido (Pendente)</strong>: Leitura ainda não marcada como lida.' },
+          { icon: 'star', text: '<strong>Dia Atual/Em Dia (Borda Azul Grossa)</strong>: Marca o dia de leitura esperado (o dia que você está hoje no plano).' },
+          { icon: '📊', text: '<strong>Status de Acompanhamento</strong>: Textos como "Atrasado (X dias)" ou "Adiantado (Y dias)" aparecem se houver uma data de início definida, indicando sua posição em relação ao progresso esperado.' }
+      ]
     },
     en: {
         titulo: 'Bible Plan',
@@ -414,9 +416,36 @@
         alert_change_plan_html: 'Warning! Changing plans will **ERASE all your current progress** (marked days and start date). Do you wish to continue?',
         cancel: 'Cancel',
         confirm_erase: 'Yes, Erase History',
+
         // NOVO: Textos para Links Adicionais
         privacy_link: 'Privacy (LGPD)',
         glossary_link: 'Glossary / Help',
+        
+        // NOVO: Textos de Privacidade
+        privacy_title: 'Privacy (LGPD)',
+        privacy_p1: 'No data is sent, stored, or accessed by external servers or the developer. The only storage occurs locally on your device (if you use the \'Export Progress JSON\' function).',
+
+        // NOVO: Textos para Botão de Iniciar/Ver Plano
+        start_plan_button: 'Start Plan', // NOVO
+        active_plan: 'Active Plan', // NOVO
+        view_plan: 'View Plan', // NOVO
+
+        // NOVO: Textos do Glossário (Movidos do HTML)
+        glossary_title: 'Glossary / Help',
+        glossary_features_title: 'Key Features',
+        glossary_features: [
+            { icon: 'calendar', text: '<strong>Active Plan (Blue Circle)</strong>: Indicates the reading plan currently in use.' },
+            { icon: '📅', text: '<strong>TODAY Button</strong>: Quickly redirects the view to the month and day of the reading that should be done today.' },
+            { icon: '⚙️', text: '<strong>Settings</strong>: Allows changing the plan duration (1 year, 6 months, 3 months), resetting progress, or changing the plan.' },
+            { icon: '📖', text: '<strong>"Read now" Button</strong>: Opens the reading verses in a new tab on Bible Gateway, in the version (NIV) corresponding to the application language.' }
+        ],
+        glossary_icons_title: 'Icons on Reading Days',
+        glossary_icons: [
+            { icon: 'check-circle', text: '<strong>Day Completed</strong>: The day has been marked as read (light gray background and red icon).' },
+            { icon: 'chevrons-right', text: '<strong>Day Not Read (Pending)</strong>: Reading not yet marked as read.' },
+            { icon: 'star', text: '<strong>Current/On Schedule Day (Thick Blue Border)</strong>: Marks the expected reading day (the day you are on in the plan today).' },
+            { icon: '📊', text: '<strong>Tracking Status</strong>: Texts like "Behind (X days)" or "Ahead (Y days)" appear if a start date is defined, indicating your position relative to the expected progress.' }
+        ]
     },
     es: {
         titulo: 'Plan Bíblico',
@@ -464,15 +493,42 @@
         alert_import_error: 'Error al importar. El archivo puede estar corrupto o en formato no válido.',
         alert_duration_change: 'Advertencia: Cambiar la duración recalcula el plan. El progreso marcado SÓLO para los días existentes en el NUEVO plan se mantendrá.',
         start_date_label: 'Fecha de Inicio',
-        // Textos para o Modal Customizado
+        // Textos para el Modal Customizado
         alert_title: '¡Advertencia!',
         alert_change_plan: '¡Advertencia! Cambiar de plan BORRARÁ todo su progreso actual (días marcados y fecha de inicio). ¿Desea continuar?',
         alert_change_plan_html: '¡Advertencia! Cambiar de plan **BORRARÁ todo su progreso actual** (días marcados y fecha de inicio). ¿Desea continuar?',
         cancel: 'Cancelar',
         confirm_erase: 'Sí, Borrar Historial',
+        
         // NOVO: Textos para Links Adicionais
         privacy_link: 'Privacidad (LGPD)',
         glossary_link: 'Glosario / Ayuda',
+
+        // NOVO: Textos de Privacidade
+        privacy_title: 'Privacidad (LGPD)',
+        privacy_p1: 'Ningún dato es enviado, almacenado o accedido por servidores externos o por el desarrollador. El único almacenamiento ocurre localmente en su dispositivo (si usa la función \'Exportar Progreso JSON\').',
+        
+        // NOVO: Textos para Botão de Iniciar/Ver Plano
+        start_plan_button: 'Empezar Plan', // NOVO
+        active_plan: 'Plan Activo', // NOVO
+        view_plan: 'Ver Plan', // NOVO
+
+        // NOVO: Textos do Glossário (Movidos do HTML)
+        glossary_title: 'Glosario / Ayuda',
+        glossary_features_title: 'Características Principales',
+        glossary_features: [
+            { icon: 'calendar', text: '<strong>Plan Activo (Círculo Azul)</strong>: Indica el plan de lectura que está en uso actualmente.' },
+            { icon: '📅', text: '<strong>Botón HOY</strong>: Redirige rápidamente la vista al mes y día de la lectura que debería hacerse hoy.' },
+            { icon: '⚙️', text: '<strong>Ajustes</strong>: Permite cambiar la duración del plan (1 año, 6 meses, 3 meses), restablecer el progreso o cambiar de plan.' },
+            { icon: '📖', text: '<strong>"Leer ahora" Botón</strong>: Abre los versículos de lectura en una nueva pestaña en Bible Gateway, en la versión (NVI-ES/NIV) correspondiente al idioma de la aplicación.' }
+        ],
+        glossary_icons_title: 'Iconos en los Días de Lectura',
+        glossary_icons: [
+            { icon: 'check-circle', text: '<strong>Día Completado</strong>: El día ha sido marcado como leído (fondo gris claro e icono rojo).' },
+            { icon: 'chevrons-right', text: '<strong>Día No Leído (Pendiente)</strong>: Lectura aún no marcada como leída.' },
+            { icon: 'star', text: '<strong>Día Actual/Al Día (Borde Azul Grueso)</strong>: Marca el día de lectura esperado (el día en que se encuentra hoy en el plan).' },
+            { icon: '📊', text: '<strong>Estado de Seguimiento</strong>: Textos como "Atrasado (X días)" ou "Adelantado (Y días)" aparecem si hay una fecha de inicio definida, indicando su posición relativa al progreso esperado.' }
+        ]
     }
   };
   
@@ -520,7 +576,7 @@
     { key:'Nahum', ch:3, name:{pt:'Naum', en:'Nahum', es:'Nahúm'} },
     { key:'Habakkuk', ch:3, name:{pt:'Habacuque', en:'Habakkuk', es:'Habacuc'} },
     { key:'Zephaniah', ch:3, name:{pt:'Sofonias', en:'Zephaniah', es:'Sofonías'} },
-    { key:'Haggai', ch:2, name:{pt:'Ageu', en:'Haggai', es:'Ageo'} },
+    { key:'Haggai', ch:2, name:{pt:'Ageu', en:'Haggai', es:'Hageo'} },
     { key:'Zechariah', ch:14, name:{pt:'Zacarias', en:'Zechariah', es:'Zacarías'} },
     { key:'Malachi', ch:4, name:{pt:'Malaquias', en:'Malachi', es:'Malaquías'} },
     { key:'Matthew', ch:28, name:{pt:'Mateus', en:'Matthew', es:'Mateo'} },
@@ -551,137 +607,300 @@
     { key:'Jude', ch:1, name:{pt:'Judas', en:'Jude', es:'Judas'} },
     { key:'Revelation', ch:22, name:{pt:'Apocalipse', en:'Revelation', es:'Apocalipsis'} }
   ];
+
   const FLAT = [];
   (function buildFlat(){
     for(const b of BOOKS){
       for(let c=1;c<=b.ch;c++) FLAT.push({ bookKey: b.key, chapter: c });
     }
   })();
+
   function bookName(bookKey, lang){
     const b = BOOKS.find(x=>x.key===bookKey);
     return b ? (b.name[lang] || b.name.pt) : bookKey;
   }
+  
   function formatRefObj(obj, lang){
     return `${bookName(obj.bookKey, lang)} ${obj.chapter}`;
   }
-  const CHRON_ORDER_KEYS = [ 
+
+  const CHRON_ORDER_KEYS = [
     'Genesis','Job','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth',
-    '1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther',
-    'Isaiah','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Zechariah','Haggai','Malachi',
-    'Psalms','Proverbs','Ecclesiastes','Song of Solomon',
-    'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','3 John','Jude','Revelation','Daniel','Jeremiah','Lamentations','Ezekiel'
+    '1 Samuel','2 Samuel','Psalms','Proverbs','Ecclesiastes','Song of Solomon',
+    '1 Kings','2 Kings','1 Chronicles','2 Chronicles','Obadiah','Joel','Jonah','Amos','Hosea',
+    'Isaiah','Micah','Nahum','Zephaniah','Habakkuk','Jeremiah','Lamentations','Ezekiel','Daniel',
+    'Ezra','Nehemiah','Esther','Haggai','Zechariah','Malachi',
+    'Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians',
+    'Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy',
+    'Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'
   ];
+
+  const OT_BOOKS = [
+    'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Joshua', 'Judges', 'Ruth',
+    '1 Samuel', '2 Samuel', '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra',
+    'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs', 'Ecclesiastes', 'Song of Solomon',
+    'Isaiah', 'Jeremiah', 'Lamentations', 'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos',
+    'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk', 'Zephaniah', 'Haggai', 'Zechariah', 'Malachi'
+  ];
+  const NT_BOOKS = [
+    'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', '1 Corinthians', '2 Corinthians',
+    'Galatians', 'Ephesians', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians',
+    '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', '1 Peter', '2 Peter',
+    '1 John', '2 John', '3 John', 'Jude', 'Revelation'
+  ];
+
+  // ---------- STATE / LOCAL STORAGE ----------
+  const state = {
+    idioma: localStorage.getItem('bib_idioma') || 'pt',
+    planoId: localStorage.getItem('bib_plano') || null,
+    planDuration: parseInt(localStorage.getItem('bib_duration')) || 365, // NOVO: Duração do plano (365, 180, 90)
+    selectedMonth: new Date().getMonth() + 1, // 1 a 12
+    planStartDate: localStorage.getItem('bib_start_date') || null,
+    pendingPlanoId: null // Mantido para o modal de confirmação
+  };
+
+  let CACHE = {};
+
+  // ---------- PLAN GENERATION LOGIC ----------
+  // (Funções de Geração de Plano - MANTIDAS)
   
-  // FUNÇÕES DE GERAÇÃO DE PLANO (AGORA USAM DURATION)
-  function genTradicional(lang, duration){
-    const total = FLAT.length; const perDay = total / duration; const plan = Array.from({length:duration}, ()=>[]); let idx=0;
-    for(let day=0; day<duration; day++){
-      const take = Math.max(1, Math.round(perDay));
-      for(let t=0; t<take && idx<total; t++, idx++) plan[day].push(formatRefObj(FLAT[idx], lang));
+  function getPlan(planId, lang){
+    const cacheKey = `${planId}_${lang}_${state.planDuration}`;
+    if(CACHE[cacheKey]) return CACHE[cacheKey];
+    
+    let plan = [];
+    const duration = state.planDuration;
+
+    switch(planId){
+      case 'tradicional': plan = genTraditional(lang, duration); break;
+      case 'cronologico': plan = genChronological(lang, duration); break;
+      case 'atnt': plan = genOTNT(lang, duration); break;
+      case 'jesus': plan = genJesusYear(lang, duration); break;
+      case 'umcap': plan = genUmCapitulo(lang, duration); break;
+      case 'salmos': plan = genOTNTandPsalms(lang, duration); break;
+      default: plan = genTraditional(lang, duration);
+    }
+    
+    // Garantir que o plano tenha a duração correta (embora a lógica acima deva garantir)
+    if (plan.length > duration) plan = plan.slice(0, duration);
+    else if (plan.length < duration) {
+        // Preenche com dias vazios se for menor (caso de plano personalizado)
+        while (plan.length < duration) plan.push(['—']);
+    }
+
+    CACHE[cacheKey] = plan;
+    return plan;
+  }
+  
+  function genTraditional(lang, duration){
+    const total = FLAT.length;
+    const perDay = total/duration;
+    const plan = Array.from({length:duration},()=>[]);
+    let idx=0;
+    for(let d=0; d<duration; d++){
+      const take = Math.max(1, Math.round(perDay * (d+1)) - idx);
+      for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(FLAT[idx], lang));
     }
     while(idx<total) plan[plan.length-1].push(formatRefObj(FLAT[idx++], lang));
     return plan;
   }
-  function genCronologico(lang, duration){
+
+  function genChronological(lang, duration){
     const arr = [];
-    for(const k of CHRON_ORDER_KEYS){
-      const book = BOOKS.find(b=>b.key===k);
+    for(const key of CHRON_ORDER_KEYS){
+      const book = BOOKS.find(b=>b.key===key);
       if(!book) continue;
-      for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter: c});
+      for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter:c});
     }
-    for(const b of BOOKS) if(!CHRON_ORDER_KEYS.includes(b.key)) for(let c=1;c<=b.ch;c++) arr.push({bookKey: b.key, chapter: c});
-    const total = arr.length; const perDay = total/duration; const plan = Array.from({length:duration},()=>[]); let idx=0;
+    const total = arr.length;
+    const perDay = total/duration;
+    const plan = Array.from({length:duration},()=>[]);
+    let idx=0;
     for(let d=0; d<duration; d++){
-      const take = Math.max(1, Math.round(perDay));
+      const take = Math.max(1, Math.round(perDay * (d+1)) - idx);
       for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(arr[idx], lang));
     }
-    while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++] , lang));
+    while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++], lang));
     return plan;
   }
-  function genATNT(lang, duration){
-    const mattIndex = FLAT.findIndex(c=>c.bookKey==='Matthew');
-    const ot = FLAT.slice(0, mattIndex); const nt = FLAT.slice(mattIndex);
-    const otPer = ot.length/duration; const ntPer = nt.length/duration;
-    const plan = Array.from({length:duration},()=>[]); let i=0,j=0;
+
+  function genOTNT(lang, duration){
+    const ot = FLAT.filter(x=>OT_BOOKS.includes(x.bookKey));
+    const nt = FLAT.filter(x=>NT_BOOKS.includes(x.bookKey));
+    const otTotal = ot.length;
+    const ntTotal = nt.length;
+    
+    const otPerDay = otTotal/duration;
+    const ntPerDay = ntTotal/duration;
+
+    const plan = Array.from({length:duration},()=>[]);
+    let i=0, j=0; // Índices para OT e NT
+
     for(let d=0; d<duration; d++){
-      const takeOT = Math.max(1, Math.round(otPer)); const takeNT = Math.max(1, Math.round(ntPer));
-      for(let t=0;t<takeOT && i<ot.length;t++,i++) plan[d].push(formatRefObj(ot[i], lang));
-      for(let t=0;t<takeNT && j<nt.length;t++,j++) plan[d].push(formatRefObj(nt[j], lang));
+        // Calcula quantos capítulos de OT e NT devem ser lidos até este dia
+        const targetOt = Math.round(otPerDay * (d+1));
+        const targetNt = Math.round(ntPerDay * (d+1));
+
+        // Determina quantos capítulos LER hoje (usando Math.max para garantir pelo menos 1 se o índice estiver atrasado)
+        const takeOT = Math.max(1, targetOt - i);
+        const takeNT = Math.max(1, targetNt - j);
+
+        // Distribui a leitura de OT
+        for(let t=0; t<takeOT && i<otTotal; t++, i++) {
+            plan[d].push(formatRefObj(ot[i], lang));
+        }
+
+        // Distribui a leitura de NT
+        for(let t=0; t<takeNT && j<ntTotal; t++, j++) {
+            plan[d].push(formatRefObj(nt[j], lang));
+        }
+        
+        // Se o dia ficou vazio (por exemplo, um dia sem leitura calculada), assegura que ele não fique vazio.
+        if (plan[d].length === 0 && (i < otTotal || j < ntTotal)) {
+            if (i < otTotal) plan[d].push(formatRefObj(ot[i++], lang));
+            if (j < ntTotal) plan[d].push(formatRefObj(nt[j++], lang));
+        }
     }
-    while(i<ot.length) plan[plan.length-1].push(formatRefObj(ot[i++], lang));
-    while(j<nt.length) plan[plan.length-1].push(formatRefObj(nt[j++], lang));
+    
+    // Se sobrar algo (no último dia devido a arredondamentos), adiciona ao último dia
+    while(i<otTotal) plan[plan.length-1].push(formatRefObj(ot[i++], lang));
+    while(j<ntTotal) plan[plan.length-1].push(formatRefObj(nt[j++], lang));
+
     return plan;
   }
+
   function genJesusYear(lang, duration){
     const order = ['Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','3 John','Jude','Revelation'];
     const arr = [];
+    
+    // 1. NT em ordem de prioridade
     for(const name of order){
       const book = BOOKS.find(b=>b.key===name);
       if(!book) continue;
       for(let c=1;c<=book.ch;c++) arr.push({bookKey: book.key, chapter:c});
     }
+
+    // 2. O restante do AT em ordem canônica (para completar 365/duration)
     for(const b of BOOKS) if(!order.includes(b.key)) for(let c=1;c<=b.ch;c++) arr.push({bookKey: b.key, chapter:c});
-    const total = arr.length; const perDay = total/duration; const plan = Array.from({length:duration},()=>[]); let idx=0;
+    
+    const total = arr.length;
+    const perDay = total/duration;
+    const plan = Array.from({length:duration},()=>[]);
+    let idx=0;
+    
     for(let d=0; d<duration; d++){
-      const take = Math.max(1, Math.round(perDay));
+      const take = Math.max(1, Math.round(perDay * (d+1)) - idx);
       for(let t=0;t<take && idx<total;t++,idx++) plan[d].push(formatRefObj(arr[idx], lang));
     }
-    while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++]));
+    
+    while(idx<total) plan[plan.length-1].push(formatRefObj(arr[idx++], lang));
     return plan;
   }
+
   function genUmCapitulo(lang, duration){
     const plan = Array.from({length:duration},()=>[]);
-    for(let i=0;i<duration;i++){
-      if(i<FLAT.length) plan[i].push(formatRefObj(FLAT[i], lang)); else plan[i].push('—');
+    
+    // Cria um array de 365 seleções (uma por dia)
+    const selection = FLAT.slice(0, 365);
+    
+    for(let i=0; i<duration; i++){
+        const dayIndex = i % 365; // Repete a seleção se duration > 365 (embora DURATIONS seja <= 365)
+        if(dayIndex < selection.length) {
+            plan[i].push(formatRefObj(selection[dayIndex], lang));
+        } else {
+            plan[i].push('—'); // Não deve acontecer com duration <= 365
+        }
     }
     return plan;
   }
-  function genComSalmos(lang, duration){
-    const mattIndex = FLAT.findIndex(c=>c.bookKey==='Matthew');
-    const ot = FLAT.slice(0, mattIndex); const nt = FLAT.slice(mattIndex);
-    const psStart = FLAT.findIndex(c=>c.bookKey==='Psalms'); const provStart = FLAT.findIndex(c=>c.bookKey==='Proverbs');
-    const psCount = BOOKS.find(b=>b.key==='Psalms').ch; const provCount = BOOKS.find(b=>b.key==='Proverbs').ch;
-    const otPer = ot.length/duration; const ntPer = nt.length/duration;
-    const plan = Array.from({length:duration},()=>[]); let i=0,j=0,p=psStart,pr=provStart,alt=true;
+  
+  function genOTNTandPsalms(lang, duration){
+    const ot_all = FLAT.filter(x=>OT_BOOKS.includes(x.bookKey) && x.bookKey !== 'Psalms' && x.bookKey !== 'Proverbs');
+    const nt_all = FLAT.filter(x=>NT_BOOKS.includes(x.bookKey));
+    const psalms = FLAT.filter(x=>x.bookKey === 'Psalms');
+    const proverbs = FLAT.filter(x=>x.bookKey === 'Proverbs');
+
+    // Total de capítulos: OT + NT + Salmos/Provérbios (365/dur)
+    const otherTotal = ot_all.length + nt_all.length;
+    const daysPerOther = duration;
+    
+    const ot_chunks = [];
+    const nt_chunks = [];
+    
+    // Distribui o AT e NT (exceto Salmos/Provérbios) em partes iguais ao longo do plano
+    // Cerca de 75% AT e 25% NT
+    const targetOT = Math.round((ot_all.length / otherTotal) * daysPerOther);
+    const targetNT = Math.round((nt_all.length / otherTotal) * daysPerOther);
+
+    // Ajusta para 100% se houver diferença
+    let otPerDay = ot_all.length / daysPerOther;
+    let ntPerDay = nt_all.length / daysPerOther;
+    
+    let otIdx = 0;
+    let ntIdx = 0;
+
+    const plan = Array.from({length: duration}, ()=>[]);
+
     for(let d=0; d<duration; d++){
-      const takeOT = Math.max(1, Math.round(otPer)); const takeNT = Math.max(1, Math.round(ntPer));
-      for(let t=0;t<takeOT && i<ot.length;t++,i++) plan[d].push(formatRefObj(ot[i], lang));
-      for(let t=0;t<takeNT && j<nt.length;t++,j++) plan[d].push(formatRefObj(nt[j], lang));
-      if(alt && p < psStart + psCount) plan[d].push(formatRefObj(FLAT[p++], lang));
-      else if(!alt && pr < provStart + provCount) plan[d].push(formatRefObj(FLAT[pr++], lang));
-      else if(p < psStart + psCount) plan[d].push(formatRefObj(FLAT[p++], lang));
-      else if(pr < provStart + provCount) plan[d].push(formatRefObj(FLAT[pr++], lang));
-      alt = !alt;
+        // Adiciona 1 Salmo (ou parte de) + 1 Provérbio/dia se possível
+        if (d < psalms.length) plan[d].push(formatRefObj(psalms[d], lang));
+        if (d < proverbs.length) plan[d].push(formatRefObj(proverbs[d], lang));
+
+        // Adiciona OT + NT restante (usando o método de arredondamento 'smooth')
+        const targetOt = Math.round(otPerDay * (d+1));
+        const targetNt = Math.round(ntPerDay * (d+1));
+
+        const takeOT = Math.max(1, targetOt - otIdx);
+        const takeNT = Math.max(1, targetNt - ntIdx);
+
+        for(let t=0; t<takeOT && otIdx < ot_all.length; t++, otIdx++) {
+            plan[d].push(formatRefObj(ot_all[otIdx], lang));
+        }
+
+        for(let t=0; t<takeNT && ntIdx < nt_all.length; t++, ntIdx++) {
+            plan[d].push(formatRefObj(nt_all[ntIdx], lang));
+        }
+        
+        // Se o dia ficou vazio (devido a arredondamentos no final do plano), preenche
+        if (plan[d].length === 0 && (otIdx < ot_all.length || ntIdx < nt_all.length)) {
+             if (otIdx < ot_all.length) plan[d].push(formatRefObj(ot_all[otIdx++], lang));
+             if (ntIdx < nt_all.length) plan[d].push(formatRefObj(nt_all[ntIdx++], lang));
+        }
     }
-    while(i<ot.length) plan[plan.length-1].push(formatRefObj(ot[i++] , lang));
-    while(j<nt.length) plan[plan.length-1].push(formatRefObj(nt[j++] , lang));
+    
+    // Garante que o que sobrou vá para o último dia
+    while(otIdx<ot_all.length) plan[plan.length-1].push(formatRefObj(ot_all[otIdx++], lang));
+    while(ntIdx<nt_all.length) plan[plan.length-1].push(formatRefObj(nt_all[ntIdx++], lang));
+
     return plan;
   }
-
-  const PLAN_GENERATORS = { tradicional: genTradicional, cronologico: genCronologico, atnt: genATNT, jesus: genJesusYear, umcap: genUmCapitulo, salmos: genComSalmos };
-  let CACHE = {};
   
-  // getPlan usa a duração do estado
-  function getPlan(id, lang){
-    const duration = state.planDuration;
-    const key = `${id}__${lang}__${duration}`;
-    if(!CACHE[key]) CACHE[key] = PLAN_GENERATORS[id](lang, duration);
-    return CACHE[key];
+  // Converte a referência do livro para URL do Bible Gateway
+  function getBibleGatewayUrl(refs, lang) {
+    if (!refs || refs.length === 0) return '#';
+    
+    let languageCode = 'NIV'; // Default
+    if (lang === 'pt') languageCode = 'NVI-PT';
+    else if (lang === 'es') languageCode = 'NVI-ES';
+    
+    // Converte a referência formatada de volta para as chaves originais dos livros
+    const bookKeys = BOOKS.map(b => b.key);
+    const parts = refs.map(ref => {
+      // Ex: 'Gênesis 1' -> 'Genesis 1'
+      const match = bookKeys.find(key => ref.includes(bookName(key, lang)));
+      if (match) {
+        // Remove o nome do livro no idioma atual e insere a chave em inglês
+        return ref.replace(bookName(match, lang), match);
+      }
+      return ref;
+    });
+
+    const combinedRefs = parts.join('; ');
+
+    return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(combinedRefs)}&version=${languageCode}`;
   }
 
-  // ---------- UI & STATE ----------
-  let state = {
-    // Carrega o idioma e o plano do localStorage ou usa o padrão 'pt'/'tradicional'
-    idioma: localStorage.getItem('bib_idioma') || 'pt',
-    planoId: localStorage.getItem('bib_plano') || null, 
-    // Duração do plano (padrão 365)
-    planDuration: parseInt(localStorage.getItem('bib_duration')) || 365,
-    // Data de início do plano (Formato: YYYY-MM-DD)
-    planStartDate: localStorage.getItem('bib_start_date') || null,
-    selectedMonth: 1,
-    selectedDayOfMonth: null,
-  };
-  
+
   // Calcula o dia do ano (1 a 365)
   function getDayOfYear(date) {
     const start = new Date(date.getFullYear(), 0, 0);
@@ -691,110 +910,140 @@
   }
 
   function dayOfYearToMonthDay(n){
-    let m=0; let day = n;
-    while(m<12 && day > DAYS_PER_MONTH[m]){ day -= DAYS_PER_MONTH[m]; m++; }
+    let m=0;
+    let day = n;
+    while(m<12 && day > DAYS_PER_MONTH[m]){
+      day -= DAYS_PER_MONTH[m];
+      m++;
+    }
     return { month: m+1, day: day };
   }
+  
   function monthDayToDayOfYear(month, day){
-    let s=0; for(let i=0;i<month-1;i++) s+=DAYS_PER_MONTH[i]; return s+day;
+    let s=0;
+    for(let i=0;i<month-1;i++) s+=DAYS_PER_MONTH[i];
+    return s+day;
   }
 
   // Alterna a visualização entre as duas "páginas"
   function showPage(pageId) {
-      const selecao = document.getElementById('paginaSelecao');
-      const plano = document.getElementById('paginaPlano');
-      const texts = UI_TEXT[state.idioma];
-
-      if (pageId === 'paginaPlano' && state.planoId) {
-          // Exibir Página do Plano
-          selecao.classList.add('hidden'); // Usa 'hidden' para ocultar
-          plano.classList.remove('hidden'); // Usa 'hidden' para mostrar
-          
-          document.getElementById('tituloApp').innerText = ` ${texts.titulo}`;
-          document.getElementById('subtituloApp').innerText = texts.subtitulo;
-          
-          renderPlanGrid();
-          renderMonths(); 
-          renderDays(state.selectedMonth); 
-          updateProgressUI();
-
-      } else {
-          // Exibir Página de Seleção
-          plano.classList.add('hidden');
-          selecao.classList.remove('hidden');
-          
-          // ATUALIZAÇÃO DO HEADER (SEM REDUNDÂNCIA NO BODY)
-          document.getElementById('tituloApp').innerText = ` ${texts.titulo_selecao}`;
-          document.getElementById('subtituloApp').innerText = texts.subtitulo_selecao;
-
-          renderPlanGrid();
-      }
-      if(window.lucide) window.lucide.createIcons();
+    const selecao = document.getElementById('paginaSelecao');
+    const plano = document.getElementById('paginaPlano');
+    const texts = UI_TEXT[state.idioma];
+    
+    if (pageId === 'paginaPlano' && state.planoId) {
+      // Exibir Página do Plano
+      selecao.classList.add('hidden'); // Usa 'hidden' para ocultar
+      plano.classList.remove('hidden'); // Usa 'hidden' para mostrar
+      document.getElementById('tituloApp').innerText = ` ${texts.titulo}`;
+      document.getElementById('subtituloApp').innerText = texts.subtitulo;
+      
+      // Renderiza novamente todo o conteúdo do plano (meses e dias)
+      renderPlanGrid();
+      renderMonths();
+      renderDays(state.selectedMonth);
+      updateProgressUI();
+    } else {
+      // Exibir Página de Seleção
+      plano.classList.add('hidden');
+      selecao.classList.remove('hidden');
+      
+      // ATUALIZAÇÃO DO HEADER (SEM REDUNDÂNCIA NO BODY)
+      document.getElementById('tituloApp').innerText = ` ${texts.titulo_selecao}`;
+      document.getElementById('subtituloApp').innerText = texts.subtitulo_selecao;
+      renderPlanGrid();
+    }
+    
+    if(window.lucide) window.lucide.createIcons();
   }
 
   // ---------- RENDER FUNCTIONS ----------
   function renderPlanGrid(){
-    const container = document.getElementById('gridPlanos'); 
-    if (!container) return; 
+    const container = document.getElementById('gridPlanos');
+    if (!container) return;
+    container.innerHTML = '';
+    const texts = UI_TEXT[state.idioma];
     
-    container.innerHTML='';
-    const texts = UI_TEXT[state.idioma].planos;
-    const icons = ['calendar','clock','layers','heart','book-open','sun'];
-    texts.forEach((p, idx)=>{
-      const card = document.createElement('div'); // O card é um div, não um botão principal
-      const isSelected = state.planoId===p.id;
-      // Usando flex-col justify-between para o botão ficar no final
-      card.className='plan-card flex flex-col justify-between p-4 rounded-xl shadow-lg transition-all duration-200 text-center ' +
-                    (isSelected ? 'bg-primary-500 text-white ring-4 ring-primary-500/50' : 'bg-white dark:bg-gray-800 hover:ring-2 hover:ring-primary-500');
-      card.style.minHeight='180px'; 
-
-      const iconColor = isSelected ? 'text-white' : 'text-primary-500';
-      const descColor = isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400';
-      const iconName = icons[idx] || 'book';
+    texts.planos.forEach(plano => {
+      const isSelected = plano.id === state.planoId;
+      const card = document.createElement('div'); // Alterado de button para div
       
+      // Classes do card
+      card.className = 'plan-button flex flex-col items-start p-4 rounded-xl transition border-4 text-left shadow-lg ' + 
+        (isSelected 
+          ? 'bg-primary-500 text-white shadow-primary-500/50 border-primary-500' 
+          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 hover:border-primary-500');
+
       card.innerHTML = `
-        <div>
-            <div class="mb-2"><i data-lucide="${iconName}" class="lucide w-8 h-8 ${iconColor}"></i></div>
-            <div class="text-base font-bold">${p.title}</div>
-            <div class="text-xs ${descColor} mt-1">${p.desc}</div>
+        <div class="flex-1 w-full">
+            <h3 class="text-lg font-extrabold">${plano.title}</h3>
+            <p class="text-sm ${isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400'} mt-1">${plano.desc}</p>
         </div>
-        <button id="btnStartPlan_${p.id}" data-plan-id="${p.id}" class="mt-4 px-4 py-2 rounded-xl font-semibold transition text-sm ${
-            isSelected 
-                ? 'bg-white text-primary-500 cursor-default opacity-80' 
-                : 'bg-primary-500 text-white hover:bg-primary-600'
-        }" ${isSelected ? 'disabled' : ''}>
-            ${isSelected ? 'Plano Ativo' : 'Iniciar Plano'}
-        </button>
-        `;
+        <div class="w-full mt-4 pt-4 border-t ${isSelected ? 'border-indigo-400' : 'border-gray-200 dark:border-gray-700'}">
+            ${isSelected 
+                ? `
+                    <div class="text-sm font-semibold flex items-center gap-2 mb-3">
+                         <i data-lucide="check-circle" class="lucide w-5 h-5 text-white fill-white/30 flex-shrink-0"></i>
+                         ${texts.active_plan}
+                    </div>
+                    <button class="w-full px-4 py-2 rounded-xl bg-white text-primary-500 font-bold hover:bg-gray-100 transition shadow-md view-plan-button">
+                        ${texts.view_plan}
+                    </button>
+                `
+                : `
+                    <button class="w-full px-4 py-2 rounded-xl bg-primary-500 text-white font-bold hover:bg-primary-600 transition shadow-md start-plan-button">
+                        ${texts.start_plan_button}
+                    </button>
+                `
+            }
+        </div>
+      `;
       
-      container.appendChild(card);
-      
-      // Adiciona o listener APENAS ao botão "Iniciar Plano"
-      if(!isSelected){
-        document.getElementById(`btnStartPlan_${p.id}`).onclick = (e)=>{
-          e.stopPropagation(); // Previne clique no card, embora o card não tenha listener principal
-          state.planoId = p.id;
-          localStorage.setItem('bib_plano', p.id); 
-          
-          // Define a data de início como hoje ao iniciar o plano (Change 1)
-          const today = new Date();
-          const y = today.getFullYear();
-          const m = String(today.getMonth() + 1).padStart(2, '0');
-          const d = String(today.getDate()).padStart(2, '0');
-          state.planStartDate = `${y}-${m}-${d}`;
-          localStorage.setItem('bib_start_date', state.planStartDate);
-
-          showPage('paginaPlano');
+      // Event listener for START button
+      const startButton = card.querySelector('.start-plan-button');
+      if(startButton){
+        startButton.onclick = () => {
+            // Se houver um plano anterior ou um progresso, pede confirmação
+            if (state.planoId) {
+                state.pendingPlanoId = plano.id; // Guarda o ID pendente (do novo plano)
+                openConfirmChangePlanModal();
+            } else {
+                // Se não houver plano anterior, seleciona e inicializa
+                clearPlanStorage(); // Garante que progresso, data e CACHE sejam apagados
+                
+                state.planoId = plano.id;
+                localStorage.setItem('bib_plano', state.planoId);
+                
+                // Define o dia de hoje como o início do plano (Change 1)
+                const today = new Date();
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const d = String(today.getDate()).padStart(2, '0');
+                state.planStartDate = `${y}-${m}-${d}`;
+                localStorage.setItem('bib_start_date', state.planStartDate);
+                
+                showPage('paginaPlano');
+            }
         };
       }
+      
+      // Event listener for VIEW button (if selected)
+      const viewButton = card.querySelector('.view-plan-button');
+      if(viewButton){
+        viewButton.onclick = () => {
+            showPage('paginaPlano');
+        };
+      }
+
+      container.appendChild(card);
     });
+
     if(window.lucide) window.lucide.createIcons();
   }
 
   function renderMonths(){
-    const div = document.getElementById('meses'); 
+    const div = document.getElementById('meses');
     if (!div) return;
-    
     div.innerHTML='';
     const months = MONTHS[state.idioma];
     
@@ -808,14 +1057,22 @@
         const m = months[i];
         const monthIndex = i + 1; // 1 a 12
         const isSelected = state.selectedMonth === monthIndex;
+        
         const btn = document.createElement('button');
         btn.className = 'flex-shrink-0 px-4 py-2 rounded-full font-semibold transition ' + 
-                        (isSelected ? 'bg-primary-500 text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600');
+            (isSelected 
+                ? 'bg-primary-500 text-white shadow-md' 
+                : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600');
         btn.innerText = m;
-        btn.onclick = ()=>{ state.selectedMonth = monthIndex; renderMonths(); renderDays(monthIndex); };
+        
+        btn.onclick = ()=>{
+            state.selectedMonth = monthIndex;
+            renderMonths();
+            renderDays(monthIndex);
+        };
         div.appendChild(btn);
     }
-    
+
     const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
     if(currentMonthButton){
         currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -823,124 +1080,124 @@
   }
 
   function renderDays(month){
-    const container = document.getElementById('dias'); 
-    if (!container || !state.planoId) return;
+    const container = document.getElementById('dias');
+    if (!container) return;
+    container.innerHTML = '';
 
-    container.innerHTML='';
     const daysInMonth = DAYS_PER_MONTH[month-1];
-    const startDayOfYear = monthDayToDayOfYear(month,1);
     const plan = getPlan(state.planoId, state.idioma);
+    const texts = UI_TEXT[state.idioma];
     
-    // NOVO: Lógica de Data e Acompanhamento
+    // Calcula o dia de hoje no plano (1 a 365)
     let dayFromStart = null;
     if (state.planStartDate) {
-        const startDate = new Date(state.planStartDate);
+        const start = new Date(state.planStartDate);
         const today = new Date();
-        // Zera o tempo para contagem de dias exata
-        startDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
-        // Dias decorridos desde o início (1-indexado)
-        dayFromStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        const diffTime = Math.abs(today - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        dayFromStart = diffDays + 1; // Dia 1 é o dia de início
     }
     
-    for(let d=1; d<=daysInMonth; d++){
-      const dayOfYear = startDayOfYear + d -1; 
-      const idx = dayOfYear -1; 
-      
-      const refs = plan[idx] || ['—']; 
-      
-      const key = `${state.planoId}_day_${dayOfYear}`; 
-      const lido = localStorage.getItem(key);
-      const card = document.createElement('div');
-      
-      const dayBeingRendered = dayOfYear; // Dia do plano sendo renderizado (1 a Duração)
-      const isExpectedDay = state.planStartDate && dayBeingRendered === dayFromStart; 
-      
-      let cardClasses = 'p-4 rounded-xl shadow-md border-t-4 cursor-pointer transition';
-      
-      // Se o dia do ano for maior que a duração do plano, não mostra leituras
-      const isOutsidePlanDuration = dayOfYear > state.planDuration;
-      const hasReadings = idx < state.planDuration && refs.some(r => r !== '—');
+    // Calcula o offset do dia do ano
+    const dayOfYearStart = monthDayToDayOfYear(month, 1);
 
-      if (isOutsidePlanDuration) {
-          cardClasses += ' border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 cursor-default opacity-70';
-      } else if (isExpectedDay && hasReadings) { // Destaque para o dia 'Em Dia'
-          cardClasses += ' today-highlight border-primary-500'; 
-      } else {
-          // Se LIDO, usa Borda Vermelha (ajustado de primary-500) e fundo cinza (read-highlight)
-          cardClasses += (lido ? ' border-red-500 opacity-90 read-highlight' : ' border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500') +
-                         ' bg-white dark:bg-gray-800';
-      }
-
-      card.className = cardClasses;
-      
-      const preview = hasReadings ? refs.slice(0,2).join(', ') : '—';
-      const iconName = lido ? 'check-circle' : (isOutsidePlanDuration ? 'minus' : 'chevrons-right');
-      const iconColor = lido ? 'text-red-500' : (isExpectedDay ? 'text-primary-500' : (isOutsidePlanDuration ? 'text-gray-400' : 'text-gray-400 dark:text-gray-500')); 
-      const textColor = isExpectedDay ? 'text-gray-800 dark:text-gray-100' : (isOutsidePlanDuration ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-200');
-
-      let statusHtml = '';
-      if (lido) {
-        // Leitura Concluída
-        statusHtml = `<p class="text-xs font-bold text-red-500 mt-2">${UI_TEXT[state.idioma].lido}</p>`;
-      } else if (state.planStartDate && hasReadings) {
-        // Alerta de Atraso/Adiantado (TRADUZIDO)
-        const texts = UI_TEXT[state.idioma]; // Objeto de textos para tradução
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dayOfYear = dayOfYearStart + d - 1; // Dia do ano (1 a 365)
+        const idx = dayOfYear - 1; // Índice do array do plano (0 a 364)
+        const refs = plan[idx] || ['—'];
+        const key = `${state.planoId}_day_${dayOfYear}`;
+        const lido = localStorage.getItem(key);
         
-        if (dayBeingRendered < dayFromStart) {
-            const diff = dayFromStart - dayBeingRendered;
-            // Atrasado: Texto vermelho
-            statusHtml = `<p class="text-xs font-bold text-red-500 mt-2">${texts.delayed} ${diff}${texts.days_behind}</p>`;
-        } else if (dayBeingRendered > dayFromStart) {
-            const diff = dayBeingRendered - dayFromStart;
-            // Adiantado: Texto verde
-            statusHtml = `<p class="text-xs font-bold text-green-500 mt-2">${texts.ahead} ${diff}${texts.days_ahead}</p>`;
-        }
-      }
+        // Verifica se é o dia esperado de leitura
+        const isExpectedDay = state.planStartDate && dayOfYear === dayFromStart; 
+        const isOutsidePlanDuration = dayOfYear > state.planDuration;
+        const hasReadings = idx < state.planDuration && refs.some(r => r !== '—');
 
-      card.innerHTML = `\
-        <div class="flex justify-between items-start">\
-          <div>\
-            <h3 class="text-xl font-extrabold ${isExpectedDay ? 'text-primary-600 dark:text-primary-400' : 'text-primary-500'}">${d}</h3>\
-            <p class="text-xs ${isExpectedDay ? 'text-primary-400 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'} font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
-          </div>\
-          <div class="${iconColor} flex-shrink-0"><i data-lucide="${iconName}" class="lucide w-6 h-6"></i></div>\
-        </div>\
-        ${statusHtml}
-        <p class="mt-3 text-sm font-medium ${textColor}">${preview}${refs.length>2 && hasReadings ? ' ...' : ''}</p>`;
-      
-      // O modal só deve abrir se houverem leituras programadas para aquele dia ou se estiver dentro da duração.
-      if (dayOfYear <= state.planDuration) {
-          card.onclick = ()=> abrirModalForDay(dayOfYear);
-      } else {
-          // Desabilita o cursor e clica se estiver fora do plano
-          card.style.cursor = 'default';
-          card.classList.remove('hover:shadow-lg', 'hover:ring-1', 'hover:ring-primary-500');
-          if (!isOutsidePlanDuration) { // Adicionado para evitar erro, mas não deve acontecer
-             card.innerHTML = `\
-                <div class="flex justify-between items-start">\
-                  <div>\
-                    <h3 class="text-xl font-extrabold text-gray-400">${d}</h3>\
-                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${formatDateSmall(month,d)}</p>\
-                  </div>\
-                  <div class="text-gray-400 flex-shrink-0"><i data-lucide="minus" class="lucide w-6 h-6"></i></div>\
-                </div>\
-                <p class="mt-3 text-sm font-medium text-gray-400">Fora do plano de ${state.planDuration} dias.</p>`;
-          }
-      }
-      
-      container.appendChild(card);
+        const card = document.createElement('div');
+        let cardClasses = 'p-3 rounded-2xl border-4 transition duration-200 cursor-pointer flex flex-col justify-between min-h-[140px]';
+        
+        if (isOutsidePlanDuration) {
+             cardClasses += ' border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 cursor-default opacity-70';
+        } else if (isExpectedDay && hasReadings) { 
+            // Destaque para o dia 'Em Dia'
+            cardClasses += ' today-highlight border-primary-500';
+        } else { 
+            // Se LIDO, usa Borda Vermelha (ajustado de primary-500) e fundo cinza (read-highlight)
+            cardClasses += (lido ? ' border-red-500 opacity-90 read-highlight' : ' border-gray-200 dark:border-gray-700 hover:shadow-lg hover:ring-1 hover:ring-primary-500') + ' bg-white dark:bg-gray-800';
+        }
+
+        card.className = cardClasses;
+        
+        const preview = hasReadings ? refs.slice(0,2).join(', ') : '—';
+        const iconName = lido ? 'check-circle' : (isOutsidePlanDuration ? 'minus' : 'chevrons-right');
+        const iconColor = lido ? 'text-red-500' : (isExpectedDay ? 'text-primary-500' : (isOutsidePlanDuration ? 'text-gray-400' : 'text-gray-400 dark:text-gray-500'));
+        const textColor = isExpectedDay ? 'text-gray-800 dark:text-gray-100' : (isOutsidePlanDuration ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-200');
+
+        let statusHtml = '';
+        if (lido) {
+            // Leitura Concluída
+            statusHtml = `<p class="text-xs font-bold text-red-500 mt-2">${UI_TEXT[state.idioma].lido}</p>`;
+        } else if (state.planStartDate && hasReadings) {
+            // Alerta de Atraso/Adiantado (TRADUZIDO)
+            const texts = UI_TEXT[state.idioma]; // Objeto de textos para tradução
+            if (dayOfYear < dayFromStart) {
+                const diff = dayFromStart - dayOfYear;
+                // Atrasado: Texto vermelho
+                statusHtml = `<p class="text-xs font-bold text-red-500 mt-2">${texts.delayed} (-${diff}${texts.days_behind})</p>`;
+            } else if (dayOfYear > dayFromStart) {
+                const diff = dayOfYear - dayFromStart;
+                // Adiantado: Texto verde
+                statusHtml = `<p class="text-xs font-bold text-green-500 mt-2">${texts.ahead} (+${diff}${texts.days_ahead})</p>`;
+            }
+        }
+
+        if (idx < state.planDuration) {
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-semibold uppercase ${textColor}">${formatDateSmall(month, d)}</div>
+                        <i data-lucide="${lido && isExpectedDay ? 'star' : iconName}" class="lucide w-6 h-6 ${iconColor} ${lido && isExpectedDay ? 'fill-red-500/30' : ''}"></i>
+                    </div>
+                    <p class="mt-3 text-sm font-bold ${textColor}">${texts.dia_leitura} ${dayOfYear}</p>
+                    <p class="text-xs ${textColor}">${preview}</p>
+                    ${statusHtml}
+                </div>
+            `;
+            
+            // Só adiciona o listener se o dia tiver leituras dentro da duração
+            if (hasReadings && !isOutsidePlanDuration) {
+                 card.onclick = () => abrirModalForDay(dayOfYear);
+            } else {
+                 card.style.cursor = 'default';
+            }
+        } else {
+            // Dia fora do plano (se duration < 365)
+            card.innerHTML = `
+                 <div>
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-semibold uppercase text-gray-400">${formatDateSmall(month, d)}</div>
+                        <div class="flex-shrink-0"><i data-lucide="minus" class="lucide w-6 h-6 text-gray-400"></i></div>
+                    </div>
+                    <p class="mt-3 text-sm font-medium text-gray-400">Fora do plano de ${state.planDuration} dias.</p>
+                 </div>`;
+        }
+        
+        container.appendChild(card);
     }
+    
     if(window.lucide) window.lucide.createIcons();
     updateProgressUI();
   }
 
-  function formatDateSmall(month, day){ const months = MONTHS[state.idioma]; return `${months[month-1]} ${day}`; }
+  function formatDateSmall(month, day){
+    const months = MONTHS[state.idioma];
+    return `${months[month-1]} ${day}`;
+  }
 
   let modalCurrentDay = null;
   const modalDiv = document.getElementById('modal');
   const modalContent = document.getElementById('modalContent');
-
+  
   function abrirModalForDay(dayOfYear){
     if (!state.planoId) return;
     modalCurrentDay = dayOfYear;
@@ -948,119 +1205,123 @@
     const refs = plan[dayOfYear-1] || [];
     const key = `${state.planoId}_day_${dayOfYear}`;
     const lido = localStorage.getItem(key);
-    
     const hasReadings = refs.some(r => r !== '—');
 
     document.getElementById('modalTitulo').innerText = `${UI_TEXT[state.idioma].start} • ${UI_TEXT[state.idioma].dia_leitura} ${dayOfYear}`;
-    const ul = document.getElementById('modalLeituras'); ul.innerHTML = '';
-    
-    if (hasReadings) {
-        refs.forEach(r=>{
-          const li = document.createElement('li'); li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
-          const icon = document.createElement('i'); icon.setAttribute('data-lucide', 'book-open'); icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
-          const span = document.createElement('span'); span.innerText = r;
-          li.appendChild(icon);
-          li.appendChild(span);
-          ul.appendChild(li);
-        });
-        
-        // Ativa os botões
-        document.getElementById('btnLido').disabled = false;
-        document.getElementById('btnLido').classList.remove('opacity-50', 'cursor-not-allowed');
-        document.getElementById('btnLerAgora').disabled = false;
-        document.getElementById('btnLerAgora').classList.remove('opacity-50', 'cursor-not-allowed');
-    } else {
-        ul.innerHTML = '<li class="text-base text-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700">Nenhuma leitura programada para este dia.</li>';
-        // Desativa os botões
-        document.getElementById('btnLido').disabled = true;
-        document.getElementById('btnLido').classList.add('opacity-50', 'cursor-not-allowed');
-        document.getElementById('btnLerAgora').disabled = true;
-        document.getElementById('btnLerAgora').classList.add('opacity-50', 'cursor-not-allowed');
-    }
-    
-    // Atualiza o texto e estilo do botão "Lido"
+    const ul = document.getElementById('modalLeituras');
+    ul.innerHTML = '';
+
     const btnLido = document.getElementById('btnLido');
-    if (lido) {
-        btnLido.innerText = UI_TEXT[state.idioma].lido;
-        btnLido.classList.add('bg-green-500', 'hover:bg-green-600', 'shadow-green-500/30');
-        btnLido.classList.remove('bg-primary-500', 'hover:bg-primary-600', 'shadow-primary-500/30');
+    const btnLerAgora = document.getElementById('btnLerAgora');
+    
+    // Atualiza texto do botão "Marcar como lido"
+    btnLido.innerText = lido ? UI_TEXT[state.idioma].nao_lido : UI_TEXT[state.idioma].marcar;
+    btnLido.classList.toggle('bg-red-500', !!lido);
+    btnLido.classList.toggle('hover:bg-red-600', !!lido);
+    btnLido.classList.toggle('bg-primary-500', !lido);
+    btnLido.classList.toggle('hover:bg-primary-600', !lido);
+    btnLido.classList.toggle('shadow-lg', true);
+    btnLido.classList.toggle('shadow-red-500/30', !!lido);
+    btnLido.classList.toggle('shadow-primary-500/30', !lido);
+
+    if (hasReadings) {
+      refs.forEach(r=>{
+        const li = document.createElement('li');
+        li.className='text-base flex items-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700';
+        const icon = document.createElement('i');
+        icon.setAttribute('data-lucide', 'book-open');
+        icon.className='lucide w-4 h-4 mr-3 text-primary-500 flex-shrink-0';
+        const span = document.createElement('span');
+        span.innerText = r;
+        li.appendChild(icon);
+        li.appendChild(span);
+        ul.appendChild(li);
+      });
+
+      // Ativa os botões
+      btnLido.disabled = false;
+      btnLido.classList.remove('opacity-50', 'cursor-not-allowed');
+      btnLerAgora.disabled = false;
+      btnLerAgora.classList.remove('opacity-50', 'cursor-not-allowed');
+
     } else {
-        btnLido.innerText = UI_TEXT[state.idioma].nao_lido;
-        btnLido.classList.add('bg-primary-500', 'hover:bg-primary-600', 'shadow-primary-500/30');
-        btnLido.classList.remove('bg-green-500', 'hover:bg-green-600', 'shadow-green-500/30');
+      ul.innerHTML = `<li class="text-base text-center p-2 rounded-lg bg-gray-50 dark:bg-gray-700">${UI_TEXT[state.idioma].nao_lido}</li>`;
+      // Desativa os botões
+      btnLido.disabled = true;
+      btnLido.classList.add('opacity-50', 'cursor-not-allowed');
+      btnLerAgora.disabled = true;
+      btnLerAgora.classList.add('opacity-50', 'cursor-not-allowed');
     }
     
-    document.getElementById('btnLerAgora').innerText = `📖 ${UI_TEXT[state.idioma].ler_agora}`;
-    
+    // Abre o modal
     modalDiv.classList.remove('hidden');
-    setTimeout(()=>{
+    setTimeout(() => {
       modalDiv.style.opacity = '1';
       modalContent.classList.remove('scale-95');
-    }, 10); 
-
+    }, 10);
+    
     if(window.lucide) window.lucide.createIcons();
   }
 
   function fecharModal(){
     modalDiv.style.opacity = '0';
     modalContent.classList.add('scale-95');
-    setTimeout(()=> modalDiv.classList.add('hidden'), 300); 
+    setTimeout(() => modalDiv.classList.add('hidden'), 300);
+    modalCurrentDay = null; // Limpa o dia atual
   }
-
+  
+  // Event Listeners do Modal
   document.getElementById('fecharModal').addEventListener('click', fecharModal);
-  
-  document.getElementById('btnLido').addEventListener('click', ()=>{
-    if(!modalCurrentDay || document.getElementById('btnLido').disabled) return; 
-    const key = `${state.planoId}_day_${modalCurrentDay}`; 
-    const lido = localStorage.getItem(key);
+  modalDiv.addEventListener('click', (e) => {
+    if(e.target.id === 'modal') fecharModal();
+  });
 
-    if (lido) {
-        localStorage.removeItem(key); // Desmarca como lido
-    } else {
-        localStorage.setItem(key,'1'); // Marca como lido
+  document.getElementById('btnLido').addEventListener('click', () => {
+    if (modalCurrentDay) {
+      const key = `${state.planoId}_day_${modalCurrentDay}`;
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key); // Desmarcar
+      } else {
+        localStorage.setItem(key, 'read'); // Marcar
+      }
+      fecharModal();
+      renderDays(state.selectedMonth); // Re-renderiza o mês atual
     }
-    
-    fecharModal(); 
-    renderDays(state.selectedMonth); 
-    updateProgressUI();
   });
 
-  document.getElementById('btnLerAgora').addEventListener('click', ()=>{
-    if(!modalCurrentDay || !state.planoId || document.getElementById('btnLerAgora').disabled) return; 
-    const plan = getPlan(state.planoId, state.idioma); 
-    const refs = plan[modalCurrentDay-1] || [];
-    if(refs.length===0 || refs.some(r=>r==='—')) return;
-    const joinForSearch = refs.map(r=> r.replace(/\s+/g,' ')).join(',');
-    const version = state.idioma==='pt' ? 'NVI-PT' : state.idioma==='en' ? 'NIV' : 'NIV';
-    const url = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(joinForSearch)}&version=${version}`;
-    window.open(url, '_blank');
+  document.getElementById('btnLerAgora').addEventListener('click', () => {
+    if (modalCurrentDay) {
+      const plan = getPlan(state.planoId, state.idioma);
+      const refs = plan[modalCurrentDay-1] || [];
+      const url = getBibleGatewayUrl(refs, state.idioma);
+      window.open(url, '_blank');
+    }
   });
-  
-  document.getElementById('modal').addEventListener('click',(e)=>{ if(e.target.id==='modal') fecharModal(); });
+
 
   function updateProgressUI(){
     if (!state.planoId) return;
-      
-    // Usa a duração do estado (que é o tamanho do plano)
+
     const total = state.planDuration;
-    let read=0;
-    for(let i=0;i<total;i++){ 
-        if(localStorage.getItem(`${state.planoId}_day_${i+1}`)) read++; 
+    let read = 0;
+    for(let i=1; i<=total; i++){
+      if(localStorage.getItem(`${state.planoId}_day_${i}`)) read++;
     }
-    const pct = Math.round((read/total)*100);
     
+    const pct = Math.round((read/total)*100);
+
     const progressoBar = document.getElementById('progressoBar');
     const textoProgresso = document.getElementById('textoProgresso');
     const textoPlanoAtual = document.getElementById('textoPlanoAtual');
     const textoDataInicio = document.getElementById('textoDataInicio'); // Elemento da data
 
-    if (progressoBar) progressoBar.style.width = pct + '%';
-    // O total é baseado na DURAÇÃO
-    if (textoProgresso) textoProgresso.innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}`;
+    if (progressoBar) progressoBar.style.width = pct + '%'; // O total é baseado na DURAÇÃO
     
+    if (textoProgresso) textoProgresso.innerText = `${UI_TEXT[state.idioma].progresso}: ${read} / ${total}`;
+
     const planoEncontrado = UI_TEXT[state.idioma].planos.find(p=>p.id===state.planoId);
     const planName = planoEncontrado ? planoEncontrado.title : '---';
-    
+
     // Atualiza o texto do display estático
     if (textoPlanoAtual) textoPlanoAtual.innerHTML = `${UI_TEXT[state.idioma].plano}: ${planName} (${total}d)`;
 
@@ -1081,7 +1342,6 @@
     }
   }
 
-
   // ---------- IDIOMA DROPDOWN LOGIC ----------
   const idiomaToggle = document.getElementById('idiomaToggle');
   const idiomaMenu = document.getElementById('idiomaMenu');
@@ -1091,7 +1351,7 @@
   function updateIdiomaDisplay(lang){
     const texts = UI_TEXT[lang];
     const flagCode = texts.flag_code;
-
+    
     // Atualiza o botão principal APENAS com a bandeira
     currentFlag.className = `flag-icon flag-icon-${flagCode}`;
     
@@ -1103,403 +1363,581 @@
             item.classList.remove('bg-gray-200', 'dark:bg-gray-600');
         }
     });
-
-    updateUITexts(lang);
+    
+    updateUITexts(lang); // Atualiza todos os textos da UI
+    
+    // Re-renderiza as páginas se estiverem ativas
+    if(!document.getElementById('paginaSelecao').classList.contains('hidden')) {
+        renderPlanGrid();
+    } else if (state.planoId) {
+        renderMonths();
+        renderDays(state.selectedMonth);
+        updateProgressUI();
+    }
   }
   
-  function toggleIdiomaMenu(){
-      const isHidden = idiomaMenu.classList.contains('hidden');
-      if (isHidden) {
-          idiomaMenu.classList.remove('hidden');
-          setTimeout(() => {
-              idiomaMenu.classList.remove('scale-95', 'opacity-0');
-          }, 10);
-      } else {
-          idiomaMenu.classList.add('scale-95', 'opacity-0');
-          setTimeout(() => {
-              idiomaMenu.classList.add('hidden');
-          }, 150);
-      }
-  }
-
-  idiomaToggle.addEventListener('click', toggleIdiomaMenu);
-  document.addEventListener('click', (e) => {
-      const idiomaDropdown = document.getElementById('idiomaDropdown');
-      const isClickInside = idiomaDropdown.contains(e.target);
-      if (!isClickInside && !idiomaMenu.classList.contains('hidden')) {
-          toggleIdiomaMenu();
-      }
-  });
-
-
-  idiomaItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-          const newLang = item.getAttribute('data-lang');
-          if (newLang !== state.idioma) {
-              state.idioma = newLang; 
-              localStorage.setItem('bib_idioma', state.idioma);
-              CACHE = {}; // Limpa o cache para recarregar os planos com os nomes no novo idioma
-              updateIdiomaDisplay(state.idioma);
-          }
-          toggleIdiomaMenu();
-      });
-  });
-
-  // Função centralizada de atualização de texto E TRADUÇÃO DO BOTÃO HOJE
   function updateUITexts(lang){
     const texts = UI_TEXT[lang];
-      
-    // Redireciona para a página correta após a mudança de idioma
-    showPage(state.planoId ? 'paginaPlano' : 'paginaSelecao');
-
-    // ATUALIZAÇÃO DO BOTÃO HOJE
-    const btnHojeText = document.getElementById('btnHojeText');
-    if (btnHojeText) {
-        btnHojeText.innerText = texts.hoje;
-    }
     
-    // ATUALIZAÇÃO DOS NOVOS LINKS DE AJUDA
+    // Atualiza elementos do Header e Botões Principais
+    document.getElementById('tituloApp').innerText = texts.titulo;
+    document.getElementById('subtituloApp').innerText = texts.subtitulo;
+    document.getElementById('btnHojeText').innerText = texts.hoje;
+    
+    // Atualiza textos do Settings Modal
+    if(document.getElementById('settingsModalTitle')) document.getElementById('settingsModalTitle').innerText = texts.settings;
+    if(document.querySelector('label[for="planDurationSelect"]')) document.querySelector('label[for="planDurationSelect"]').innerText = texts.duration_label;
+    if(document.getElementById('btnTrocarPlano')) document.getElementById('btnTrocarPlano').innerText = texts.link_trocar;
+    if(document.getElementById('btnResetarProgresso')) document.getElementById('btnResetarProgresso').innerText = texts.reset_progress;
+    if(document.getElementById('backupRestoreTitle')) document.getElementById('backupRestoreTitle').innerText = texts.backup_restore;
+    if(document.getElementById('btnExport')) document.getElementById('btnExport').innerText = texts.export_progress;
+    if(document.getElementById('btnImport')) document.getElementById('btnImport').innerText = texts.import_progress;
+    
+    // Atualiza opções de duração
+    const select = document.getElementById('planDurationSelect');
+    if (select) {
+        // Preserva o valor atual, remove, e recria as options
+        const currentValue = select.value;
+        select.innerHTML = '';
+        DURATIONS.forEach(d => {
+            const option = document.createElement('option');
+            option.value = d;
+            option.innerText = texts.duration_options[d];
+            select.appendChild(option);
+        });
+        select.value = currentValue || state.planDuration; // Tenta restaurar ou usa o padrão
+    }
+
+    // ATUALIZAÇÃO DOS LINKS DE PRIVACIDADE E AJUDA
     const linkPrivacidade = document.getElementById('linkPrivacidade');
     const btnAbrirGlossario = document.getElementById('btnAbrirGlossario');
     if (linkPrivacidade) linkPrivacidade.innerText = texts.privacy_link;
     if (btnAbrirGlossario) btnAbrirGlossario.innerText = texts.glossary_link;
 
     // ATUALIZAÇÃO DO NOVO MODAL DE CONFIRMAÇÃO
-    const modal = document.getElementById('confirmChangePlanModal');
-    if (modal && !modal.classList.contains('hidden')) { // Se o modal estiver aberto, atualiza o texto imediatamente
+    const confirmChangePlanModal = document.getElementById('confirmChangePlanModal');
+    if (confirmChangePlanModal && !confirmChangePlanModal.classList.contains('hidden')) {
+        // Se o modal estiver aberto, atualiza o texto imediatamente
         document.getElementById('confirmTitle').innerText = texts.alert_title || 'Atenção!';
         document.getElementById('confirmMessage').innerHTML = texts.alert_change_plan_html;
         document.getElementById('btnCancelChangePlan').innerText = texts.cancel;
         document.getElementById('btnConfirmChangePlan').innerText = texts.confirm_erase;
     }
+    
+    // NOVO: RENDERIZA CONTEÚDO DOS MODAIS DE PRIVACIDADE E GLOSSÁRIO SE ESTIVEREM ABERTOS
+    const privacyModal = document.getElementById('privacyModal');
+    const glossaryModal = document.getElementById('glossaryModal');
+    if (privacyModal && !privacyModal.classList.contains('hidden')) {
+      renderPrivacyContent(texts);
+    }
+    if (glossaryModal && !glossaryModal.classList.contains('hidden')) {
+      renderGlossaryContent(texts);
+    }
   }
+
+  // Lógica do Dropdown de Idiomas
+  idiomaToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isHidden = idiomaMenu.classList.contains('hidden');
+    if(isHidden){
+      idiomaMenu.classList.remove('hidden');
+      setTimeout(() => {
+          idiomaMenu.classList.remove('scale-95', 'opacity-0');
+      }, 10);
+    } else {
+      idiomaMenu.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+          idiomaMenu.classList.add('hidden');
+      }, 150);
+    }
+  });
+
+  idiomaItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const newLang = item.getAttribute('data-lang');
+      if (state.idioma !== newLang) {
+        state.idioma = newLang;
+        localStorage.setItem('bib_idioma', newLang);
+        updateIdiomaDisplay(newLang);
+        fecharModal(); // Fecha o modal de leituras se estiver aberto
+      }
+      idiomaMenu.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+          idiomaMenu.classList.add('hidden');
+      }, 150);
+    });
+  });
+
+  // Fecha o menu de idiomas se clicar fora
+  document.addEventListener('click', (e) => {
+    if (!idiomaDropdown.contains(e.target)) {
+      idiomaMenu.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+          idiomaMenu.classList.add('hidden');
+      }, 150);
+    }
+  });
+
 
   // NOVA FUNÇÃO: Navega para o mês atual e destaca o dia atual
   function goToToday() {
-      if (!state.planoId) return;
+    if (!state.planoId) return;
+    
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1;
+    
+    // Atualiza o estado do mês selecionado se for diferente
+    if (state.selectedMonth !== currentMonth) {
+      state.selectedMonth = currentMonth;
+    }
 
-      const today = new Date();
-      const currentMonth = today.getMonth() + 1; 
-      
-      if (state.selectedMonth !== currentMonth) {
-          state.selectedMonth = currentMonth;
-      }
-      
-      renderMonths();
-      renderDays(state.selectedMonth);
-      
-      const mesesContainer = document.getElementById('meses');
-      const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
-      if (mesesContainer && currentMonthButton) {
-          currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+    renderMonths();
+    renderDays(state.selectedMonth);
+
+    // Rola para o botão do mês atual
+    const mesesContainer = document.getElementById('meses');
+    const currentMonthButton = document.querySelector(`#meses button:nth-child(${state.selectedMonth})`);
+    if (mesesContainer && currentMonthButton) {
+        currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Rola para o dia 'hoje' (o dia do plano esperado)
+    if (state.planStartDate) {
+        const start = new Date(state.planStartDate);
+        const diffTime = Math.abs(today - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        const dayFromStart = diffDays + 1;
+
+        const dayToScroll = document.querySelector(`[data-day-of-year="${dayFromStart}"]`);
+        if(dayToScroll) {
+            dayToScroll.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
   }
-  
+
+  document.getElementById('btnHoje').addEventListener('click', goToToday);
+
+
   function clearPlanStorage(){
-      // Limpa as chaves de configuração do plano
-      localStorage.removeItem('bib_plano');
-      localStorage.removeItem('bib_duration');
-      localStorage.removeItem('bib_start_date');
+    // Limpa as chaves de configuração do plano
+    localStorage.removeItem('bib_plano');
+    localStorage.removeItem('bib_duration');
+    localStorage.removeItem('bib_start_date');
 
-      // Limpa todas as chaves de progresso do plano anterior (mais seguro que usar o ID)
-      const keysToRemove = [];
-      for(let i=0; i<localStorage.length; i++){
-          const key = localStorage.key(i);
-          if(key.includes('_day_')){
-              keysToRemove.push(key);
-          }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      
-      // Reseta o estado
-      state.planoId = null;
-      state.planDuration = 365;
-      state.planStartDate = null;
-      CACHE = {};
+    // Limpa todas as chaves de progresso do plano anterior (mais seguro que usar o ID)
+    const keysToRemove = [];
+    for(let i=0; i<localStorage.length; i++){
+        const key = localStorage.key(i);
+        if(key && key.includes('_day_')){
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+
+    // Reseta o estado
+    state.planoId = null;
+    state.planDuration = 365;
+    state.planStartDate = null;
+    CACHE = {}; // REQUISITO: LIMPAR CACHE
   }
-
 
   // NOVO: LÓGICA DO MODAL DE CONFIGURAÇÕES
   const settingsModal = document.getElementById('settingsModal');
   const planDurationSelect = document.getElementById('planDurationSelect');
 
   function openSettingsModal(){
-      const texts = UI_TEXT[state.idioma];
+    const texts = UI_TEXT[state.idioma];
+    
+    // Atualiza textos do modal
+    document.getElementById('settingsModalTitle').innerText = texts.settings;
+    document.querySelector('label[for="planDurationSelect"]').innerText = texts.duration_label;
+    document.getElementById('btnTrocarPlano').innerText = texts.link_trocar;
+    document.getElementById('btnResetarProgresso').innerText = texts.reset_progress;
+    document.getElementById('backupRestoreTitle').innerText = texts.backup_restore;
+    document.getElementById('btnExport').innerText = texts.export_progress;
+    document.getElementById('btnImport').innerText = texts.import_progress;
+    document.getElementById('durationWarning').innerText = texts.alert_duration_change;
 
-      // Atualiza textos do modal
-      document.getElementById('settingsModalTitle').innerText = texts.settings;
-      document.querySelector('label[for="planDurationSelect"]').innerText = texts.duration_label;
-      document.getElementById('btnTrocarPlano').innerText = texts.link_trocar;
-      document.getElementById('btnResetarProgresso').innerText = texts.reset_progress;
-      document.getElementById('backupRestoreTitle').innerText = texts.backup_restore;
-      document.getElementById('btnExport').innerText = texts.export_progress;
-      document.getElementById('btnImport').innerText = texts.import_progress;
-      document.getElementById('durationWarning').innerText = texts.alert_duration_change;
+    // Atualiza opções de duração no select
+    updateUITexts(state.idioma);
 
+    planDurationSelect.value = state.planDuration;
 
-      // Preenche o seletor de duração
-      planDurationSelect.innerHTML = DURATIONS.map(d => 
-          `<option value="${d}">${texts.duration_options[d] || d + ' Days'}</option>`
-      ).join('');
-      // Seleciona o valor atual
-      planDurationSelect.value = state.planDuration.toString();
-
-      settingsModal.classList.remove('hidden');
-      setTimeout(() => {
-          settingsModal.style.opacity = '1';
-          document.getElementById('settingsModalContent').classList.remove('scale-95');
-      }, 10);
-      if(window.lucide) window.lucide.createIcons();
+    settingsModal.classList.remove('hidden');
+    setTimeout(() => {
+        settingsModal.style.opacity = '1';
+        document.getElementById('settingsModalContent').classList.remove('scale-95');
+    }, 10);
+    if(window.lucide) window.lucide.createIcons();
   }
 
-  function closeSettingsModal(){
+  function closeSettingsModal() {
       settingsModal.style.opacity = '0';
       document.getElementById('settingsModalContent').classList.add('scale-95');
       setTimeout(() => settingsModal.classList.add('hidden'), 300);
   }
-  
-  // NOVO: LÓGICA DO MODAL DE GLOSSÁRIO
-  const glossaryModal = document.getElementById('glossaryModal');
-  
-  function openGlossaryModal(){
-      const texts = UI_TEXT[state.idioma];
 
-      // Atualiza o título do modal
-      document.getElementById('glossaryModalTitle').innerText = texts.glossary_link; 
+  document.getElementById('btnOpenSettings').addEventListener('click', openSettingsModal);
+  document.getElementById('fecharSettingsModal').addEventListener('click', closeSettingsModal);
+  settingsModal.addEventListener('click', (e) => {
+      if(e.target.id === 'settingsModal') closeSettingsModal();
+  });
 
-      glossaryModal.classList.remove('hidden');
-      setTimeout(() => {
-          glossaryModal.style.opacity = '1';
-          document.getElementById('glossaryModalContent').classList.remove('scale-95');
-      }, 10);
-      if(window.lucide) window.lucide.createIcons();
-  }
-
-  function closeGlossaryModal(){
-      glossaryModal.style.opacity = '0';
-      document.getElementById('glossaryModalContent').classList.add('scale-95');
-      setTimeout(() => glossaryModal.classList.add('hidden'), 300);
-  }
-
-  // Handler: Duração do Plano
+  // Handler para troca de duração (Plan Duration Select)
   planDurationSelect.addEventListener('change', (e) => {
       const newDuration = parseInt(e.target.value);
       if (newDuration !== state.planDuration) {
+          // A alteração de duração APENAS recalculada o plano. 
+          // O progresso (keys no localStorage) é mantido para os dias que caírem no novo range.
           state.planDuration = newDuration;
           localStorage.setItem('bib_duration', newDuration);
           CACHE = {}; // Invalida o cache para gerar o novo plano
+          
           closeSettingsModal();
           showPage('paginaPlano'); // Re-renderiza o plano com a nova duração
       }
   });
 
+
   // --- Funções do Novo Modal de Confirmação (Estiloso) ---
   const confirmChangePlanModal = document.getElementById('confirmChangePlanModal');
   const confirmChangePlanContent = document.getElementById('confirmChangePlanContent');
 
-  function openConfirmChangePlanModal() {
-      const texts = UI_TEXT[state.idioma];
+  function openConfirmChangePlanModal(isReset = false) {
+    const texts = UI_TEXT[state.idioma];
+    
+    document.getElementById('confirmTitle').innerText = isReset ? texts.alert_title : texts.alert_title || 'Atenção!';
+    
+    if (isReset) {
+         document.getElementById('confirmMessage').innerHTML = texts.alert_reset;
+         document.getElementById('btnConfirmChangePlan').innerText = texts.reset_progress;
+         document.getElementById('btnConfirmChangePlan').classList.remove('bg-red-500', 'hover:bg-red-600', 'shadow-red-500/30');
+         document.getElementById('btnConfirmChangePlan').classList.add('bg-orange-500', 'hover:bg-orange-600', 'shadow-orange-500/30');
+    } else {
+         document.getElementById('confirmMessage').innerHTML = texts.alert_change_plan_html;
+         document.getElementById('btnConfirmChangePlan').innerText = texts.confirm_erase;
+         document.getElementById('btnConfirmChangePlan').classList.add('bg-red-500', 'hover:bg-red-600', 'shadow-red-500/30');
+         document.getElementById('btnConfirmChangePlan').classList.remove('bg-orange-500', 'hover:bg-orange-600', 'shadow-orange-500/30');
+    }
 
-      document.getElementById('confirmTitle').innerText = texts.alert_title || 'Atenção!';
-      document.getElementById('confirmMessage').innerHTML = texts.alert_change_plan_html; 
-      document.getElementById('btnCancelChangePlan').innerText = texts.cancel;
-      document.getElementById('btnConfirmChangePlan').innerText = texts.confirm_erase;
+    // Configura o handler de confirmação baseado no modo
+    document.getElementById('btnConfirmChangePlan').onclick = isReset 
+        ? handleConfirmResetProgress 
+        : handleConfirmChangePlan;
 
-      confirmChangePlanModal.classList.remove('hidden');
-      setTimeout(() => {
-          confirmChangePlanModal.style.opacity = '1';
-          confirmChangePlanContent.classList.remove('scale-95');
-      }, 10);
-      if(window.lucide) window.lucide.createIcons();
+    confirmChangePlanModal.classList.remove('hidden');
+    setTimeout(() => {
+      confirmChangePlanModal.style.opacity = '1';
+      confirmChangePlanContent.classList.remove('scale-95');
+    }, 10);
+    if(window.lucide) window.lucide.createIcons();
   }
 
   function closeConfirmChangePlanModal() {
-      confirmChangePlanModal.style.opacity = '0';
-      confirmChangePlanContent.classList.add('scale-95');
-      setTimeout(() => confirmChangePlanModal.classList.add('hidden'), 300);
+    confirmChangePlanModal.style.opacity = '0';
+    confirmChangePlanContent.classList.add('scale-95');
+    setTimeout(() => confirmChangePlanModal.classList.add('hidden'), 300);
+    state.pendingPlanoId = null; // Limpa o ID pendente
   }
+  
+  // Handlers para o modal de confirmação
+  const handleConfirmChangePlan = () => {
+    // Verifica se a intenção é apenas trocar de plano (voltar para a seleção)
+    if (state.pendingPlanoId === 'GO_TO_SELECTION_MODE') {
+        clearPlanStorage(); // Limpa tudo (incluindo progresso e CACHE)
+        closeConfirmChangePlanModal();
+        showPage('paginaSelecao'); // <--- FIX: Redireciona para a seleção
+    }
+    // Se houver um ID pendente, é a ação de iniciar um NOVO plano na tela de seleção.
+    else if (state.pendingPlanoId) {
+        clearPlanStorage(); // Apaga tudo, incluindo o CACHE
+        
+        // Define o novo plano
+        state.planoId = state.pendingPlanoId;
+        localStorage.setItem('bib_plano', state.planoId);
+        
+        // Define o dia de hoje como o início do novo plano
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        state.planStartDate = `${y}-${m}-${d}`;
+        localStorage.setItem('bib_start_date', state.planStartDate);
+        
+        closeConfirmChangePlanModal();
+        showPage('paginaPlano'); // Permanece na página do plano
+    }
+  };
 
-  // Handler: Trocar Plano (MODIFICADO para abrir o modal customizado)
+  const handleConfirmResetProgress = () => {
+      // Ação: Resetar Progresso (confirmação)
+      const totalDays = state.planDuration;
+      for (let i = 1; i <= totalDays; i++) {
+          localStorage.removeItem(`${state.planoId}_day_${i}`);
+      }
+      localStorage.removeItem('bib_start_date'); // Também reseta a data de início
+
+      state.planStartDate = null;
+      closeConfirmChangePlanModal();
+      showPage('paginaPlano'); // Re-renderiza o plano para refletir o reset
+  };
+  
+  // Handler: Trocar Plano (MODIFICADO para abrir o modal customizado e setar a intenção)
   document.getElementById('btnTrocarPlano').addEventListener('click', () => {
-      closeSettingsModal(); // Fecha o modal de configurações primeiro
-      openConfirmChangePlanModal(); // Abre o novo modal de confirmação
+    closeSettingsModal(); // Fecha o modal de configurações primeiro
+    state.pendingPlanoId = 'GO_TO_SELECTION_MODE'; // Sinaliza a intenção de trocar
+    openConfirmChangePlanModal(false); // Abre o novo modal de confirmação (Trocar Plano)
   });
 
   // Handler: Cancelar a troca de plano no modal customizado
   document.getElementById('btnCancelChangePlan').addEventListener('click', () => {
-      closeConfirmChangePlanModal();
-  });
-  
-  // Handler: Confirmar a troca de plano no modal customizado
-  document.getElementById('btnConfirmChangePlan').addEventListener('click', () => {
-      clearPlanStorage(); // ZERA O CACHE!
-      closeConfirmChangePlanModal();
-      showPage('paginaSelecao');
+    closeConfirmChangePlanModal();
   });
 
-  document.getElementById('confirmChangePlanModal').addEventListener('click', (e) => { 
-      if(e.target.id === 'confirmChangePlanModal') closeConfirmChangePlanModal(); 
+  document.getElementById('confirmChangePlanModal').addEventListener('click', (e) => {
+    if(e.target.id === 'confirmChangePlanModal') closeConfirmChangePlanModal();
   });
-
 
   // Handler: Resetar Progresso
   document.getElementById('btnResetarProgresso').addEventListener('click', () => {
-      if (confirm(UI_TEXT[state.idioma].alert_reset)) {
-          const totalDays = state.planDuration;
-          // Limpa apenas os itens de progresso do plano atual
-          for (let i = 1; i <= totalDays; i++) {
-              localStorage.removeItem(`${state.planoId}_day_${i}`);
-          }
-          // Opcional: limpa a data de início se o plano for resetado
-          localStorage.removeItem('bib_start_date');
-          state.planStartDate = null;
-
-          closeSettingsModal();
-          showPage('paginaPlano'); // Re-renderiza a página para mostrar o progresso zerado
-      }
+    closeSettingsModal();
+    openConfirmChangePlanModal(true); // Abre o modal de confirmação (Resetar)
   });
 
 
-  // Handler: Exportar Progresso
-  function exportProgress() {
-      const data = {};
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-          // Filtra apenas os dados de progresso e configurações relevantes
-          if (key.startsWith('bib_') || key.includes('_day_')) {
-              data[key] = localStorage.getItem(key);
-          }
+  // --- LÓGICA DE BACKUP / RESTAURAÇÃO ---
+  document.getElementById('btnExport').addEventListener('click', () => {
+    const data = {};
+    for (const key in localStorage) {
+        if (key.startsWith('bib_') || key.includes('_day_')) {
+            data[key] = localStorage.getItem(key);
+        }
+    }
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plano_biblico_backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btnImport').addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/json';
+    
+    fileInput.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                
+                if (!importedData || typeof importedData !== 'object') {
+                     throw new Error('Formato de dados inválido.');
+                }
+
+                // Limpa as chaves atuais relacionadas ao progresso
+                const keysToClear = Object.keys(localStorage).filter(key => key.startsWith('bib_') || key.includes('_day_'));
+                keysToClear.forEach(key => localStorage.removeItem(key));
+                
+                // Importa os novos dados
+                for (const key in importedData) {
+                    localStorage.setItem(key, importedData[key]);
+                }
+
+                // Atualiza o estado global com os novos dados
+                state.idioma = localStorage.getItem('bib_idioma') || 'pt';
+                state.planoId = localStorage.getItem('bib_plano') || null;
+                state.planDuration = parseInt(localStorage.getItem('bib_duration')) || 365;
+                state.planStartDate = localStorage.getItem('bib_start_date') || null;
+                
+                closeSettingsModal();
+                alert(UI_TEXT[state.idioma].alert_import_success);
+                location.reload();
+
+            } catch (error) {
+                console.error("Erro durante a importação:", error);
+                alert(UI_TEXT[state.idioma].alert_import_error);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    fileInput.remove();
+  });
+
+
+  // --- LÓGICA DO NOVO MODAL DE PRIVACIDADE ---
+  const privacyModal = document.getElementById('privacyModal');
+  const privacyModalContent = document.getElementById('privacyModalContent');
+
+  function openPrivacyModal() {
+      const texts = UI_TEXT[state.idioma];
+      renderPrivacyContent(texts); // Renderiza o conteúdo antes de abrir
+      privacyModal.classList.remove('hidden');
+      setTimeout(() => {
+          privacyModal.style.opacity = '1';
+          privacyModalContent.classList.remove('scale-95');
+      }, 10);
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closePrivacyModal() {
+      privacyModal.style.opacity = '0';
+      privacyModalContent.classList.add('scale-95');
+      setTimeout(() => privacyModal.classList.add('hidden'), 300);
+  }
+  
+  // RENDERIZA O CONTEÚDO DE PRIVACIDADE
+  function renderPrivacyContent(texts) {
+      document.getElementById('privacyModalTitle').innerText = texts.privacy_title;
+      document.getElementById('privacyContentArea').innerHTML = `
+          <p class="text-base font-medium">${texts.privacy_p1}</p>
+          <p class="text-sm italic text-gray-500 dark:text-gray-400 border-t pt-4 border-gray-200 dark:border-gray-700">
+              <i data-lucide="alert-triangle" class="lucide w-4 h-4 inline mr-1 text-yellow-500"></i>
+              ${texts.privacy_title.replace(' (LGPD)', '')}: ${texts.privacy_p1.includes('JSON') ? 'O único momento em que há transferência de dados é quando VOCÊ usa a função "Exportar Progresso JSON" para fazer um backup manual. Fora disso, nada sai do seu dispositivo.' : 'Local storage only.'}
+          </p>
+      `;
+  }
+
+  document.getElementById('fecharPrivacyModal').addEventListener('click', closePrivacyModal);
+  privacyModal.addEventListener('click', (e) => {
+      if(e.target.id === 'privacyModal') closePrivacyModal();
+  });
+
+  // Handler para o link 'Privacidade (LGPD)' (linkPrivacidade) - Substitui o alert
+  document.getElementById('linkPrivacidade').addEventListener('click', (e) => {
+      e.preventDefault();
+      openPrivacyModal(); // Abre o novo modal
+  });
+
+
+  // --- LÓGICA DO MODAL DE GLOSSÁRIO (MODIFICADA PARA TRADUÇÃO) ---
+  const glossaryModal = document.getElementById('glossaryModal');
+  const glossaryModalContent = document.getElementById('glossaryModalContent');
+  const glossaryContentArea = document.getElementById('glossaryContentArea');
+
+  function openGlossaryModal() {
+      const texts = UI_TEXT[state.idioma];
+      renderGlossaryContent(texts); // Renderiza o conteúdo antes de abrir
+      glossaryModal.classList.remove('hidden');
+      setTimeout(() => {
+          glossaryModal.style.opacity = '1';
+          glossaryModalContent.classList.remove('scale-95');
+      }, 10);
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closeGlossaryModal() {
+      glossaryModal.style.opacity = '0';
+      glossaryModalContent.classList.add('scale-95');
+      setTimeout(() => glossaryModal.classList.add('hidden'), 300);
+  }
+  
+  // RENDERIZA O CONTEÚDO DO GLOSSÁRIO
+  function renderGlossaryContent(texts) {
+      document.getElementById('glossaryModalTitle').innerText = texts.glossary_title;
+      
+      let html = '';
+      
+      // Seção Funcionalidades Principais
+      html += `<h4 class="text-lg font-bold text-primary-500">${texts.glossary_features_title}</h4>
+              <ul class="space-y-3">`;
+      texts.glossary_features.forEach(item => {
+          // Permite ícones lucide ou emojis
+          const iconHtml = item.icon.length > 3 && item.icon.includes(' ') === false ? 
+                            `<i data-lucide="${item.icon}" class="lucide w-5 h-5 text-primary-500"></i>` : 
+                            `<span class="text-xl">${item.icon}</span>`;
+                            
+          html += `<li class="flex items-start">
+                      <span class="mr-3 mt-1 flex-shrink-0">${iconHtml}</span>
+                      <p>${item.text}</p>
+                  </li>`;
       });
+      html += `</ul>`;
+      
+      // Seção Ícones nos Dias de Leitura
+      html += `<h4 class="text-lg font-bold text-primary-500 pt-4 border-t border-gray-200 dark:border-gray-700">${texts.glossary_icons_title}</h4>
+              <ul class="space-y-3">`;
+      texts.glossary_icons.forEach(item => {
+          // Permite ícones lucide ou emojis
+          const isStar = item.icon === 'star';
+          const iconHtml = item.icon.length > 3 && item.icon.includes(' ') === false ? 
+                            `<i data-lucide="${item.icon}" class="lucide w-5 h-5 ${isStar ? 'text-primary-500 fill-primary-500/50' : 'text-red-500'}"></i>` : 
+                            `<span class="text-xl">${item.icon}</span>`;
+                            
+          html += `<li class="flex items-start">
+                      <span class="mr-3 mt-1 flex-shrink-0">${iconHtml}</span>
+                      <p>${item.text}</p>
+                  </li>`;
+      });
+      html += `</ul>`;
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-      const downloadAnchorNode = document.createElement('a');
-      downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", `bible_plan_backup_${new Date().toISOString().slice(0, 10)}.json`);
-      document.body.appendChild(downloadAnchorNode);
-      downloadAnchorNode.click();
-      downloadAnchorNode.remove();
+      glossaryContentArea.innerHTML = html;
   }
-  document.getElementById('btnExport').addEventListener('click', exportProgress);
+
+  document.getElementById('fecharGlossaryModal').addEventListener('click', closeGlossaryModal);
+  glossaryModal.addEventListener('click', (e) => {
+      if(e.target.id === 'glossaryModal') closeGlossaryModal();
+  });
+
+  // Handler para o botão 'Abrir Glossário' (btnAbrirGlossario)
+  document.getElementById('btnAbrirGlossario').addEventListener('click', openGlossaryModal);
 
 
-  // Handler: Importar Progresso
-  function importProgress() {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'application/json';
-      fileInput.style.display = 'none';
+  // ---------- INITIALIZATION ----------
+  // Função de inicialização
+  function initialize() {
+    // 1. Aplica o tema
+    const root = document.documentElement;
+    const themeStatusText = document.getElementById('themeStatusText'); 
 
-      fileInput.onchange = e => {
-          const file = e.target.files[0];
-          if (!file) return;
+    function applyTheme(isDark) {
+        root.classList.toggle('dark', !!isDark);
+        if (isDark) {
+            localStorage.setItem('bib_theme', 'dark');
+            if (themeStatusText) themeStatusText.innerText = '🌞'; 
+        } else {
+            localStorage.removeItem('bib_theme');
+            if (themeStatusText) themeStatusText.innerText = '🌙';
+        }
+    }
 
-          const reader = new FileReader();
-          reader.onload = function(event) {
-              try {
-                  const importedData = JSON.parse(event.target.result);
-                  
-                  // Limpa o localStorage de dados de plano e configurações relevantes antes de importar
-                  const keysToClear = Object.keys(localStorage).filter(key => key.startsWith('bib_') || key.includes('_day_'));
-                  keysToClear.forEach(key => localStorage.removeItem(key));
-
-                  // Importa os novos dados
-                  for (const key in importedData) {
-                      localStorage.setItem(key, importedData[key]);
-                  }
-
-                  // Atualiza o estado global com os novos dados
-                  state.idioma = localStorage.getItem('bib_idioma') || 'pt';
-                  state.planoId = localStorage.getItem('bib_plano') || null;
-                  state.planDuration = parseInt(localStorage.getItem('bib_duration')) || 365;
-                  state.planStartDate = localStorage.getItem('bib_start_date') || null;
-
-                  closeSettingsModal();
-                  alert(UI_TEXT[state.idioma].alert_import_success);
-                  location.reload(); 
-
-              } catch (error) {
-                  console.error("Erro durante a importação:", error);
-                  alert(UI_TEXT[state.idioma].alert_import_error);
-              }
-          };
-          reader.readAsText(file);
-      };
-
-      document.body.appendChild(fileInput);
-      fileInput.click();
-      fileInput.remove();
-  }
-  document.getElementById('btnImport').addEventListener('click', importProgress);
-
-  // ---------- INITIALIZE APP ----------
-  function init(){
-    const today = new Date(); 
-    state.planoId = localStorage.getItem('bib_plano');
-    state.selectedMonth = state.selectedMonth || (today.getMonth()+1);
-    
-    // 1. Inicializa o display do idioma, o que chama updateUITexts
-    updateIdiomaDisplay(state.idioma);
-    
-    // 2. Adiciona o listener para o novo botão Hoje
-    const btnHoje = document.getElementById('btnHoje');
-    if (btnHoje) {
-        btnHoje.addEventListener('click', goToToday);
+    function toggleTheme() {
+        const nowDark = root.classList.contains('dark');
+        applyTheme(!nowDark);
     }
     
-    // 3. Adiciona o listener para o novo botão Configurações
-    document.getElementById('btnOpenSettings').addEventListener('click', openSettingsModal);
-    document.getElementById('settingsModal').addEventListener('click', (e) => { 
-        if(e.target.id === 'settingsModal') closeSettingsModal(); 
-    });
+    const storedDark = localStorage.getItem('bib_theme') === 'dark';
+    applyTheme(storedDark);
     
-    // 4. Adiciona o listener para o botão de Glossário
-    document.getElementById('btnAbrirGlossario').addEventListener('click', openGlossaryModal);
-    document.getElementById('fecharGlossaryModal').addEventListener('click', closeGlossaryModal);
-    document.getElementById('glossaryModal').addEventListener('click', (e) => { 
-        if(e.target.id === 'glossaryModal') closeGlossaryModal(); 
-    });
+    // Adiciona listener ao botão de tema
+    const btnTema = document.getElementById('btnTema');
+    if(btnTema) btnTema.addEventListener('click', toggleTheme);
     
-    // 5. Adiciona o listener ao link de privacidade (Apenas um placeholder para um link real)
-    document.getElementById('linkPrivacidade').addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Aqui você colocaria o link ou o conteúdo da Política de Privacidade. O Plano Bíblico é 100% armazenado localmente no seu navegador e não coleta dados.');
-    });
+    // 2. Define o idioma e atualiza a UI
+    updateIdiomaDisplay(state.idioma);
+
+    // 3. Exibe a página correta
+    if (state.planoId) {
+      showPage('paginaPlano');
+    } else {
+      showPage('paginaSelecao');
+    }
   }
-  
+
   // Executa a inicialização após o DOM carregar
-  document.addEventListener('DOMContentLoaded', () => {
-      // --- Lógica do Tema (Original) ---
-      const btnTema = document.getElementById('btnTema');
-      const themeStatusText = document.getElementById('themeStatusText'); 
-      const root = document.documentElement;
-  
-      function applyTheme(isDark) {
-          root.classList.toggle('dark', !!isDark);
-          if (isDark) {
-              localStorage.setItem('bib_theme', 'dark');
-              if (themeStatusText) themeStatusText.innerText = '🌞'; 
-          } else {
-              localStorage.removeItem('bib_theme');
-              if (themeStatusText) themeStatusText.innerText = '🌙';
-          }
-      }
-  
-      function toggleTheme() {
-          const nowDark = root.classList.contains('dark');
-          applyTheme(!nowDark);
-      }
-  
-      // 1. Inicializa o tema na carga
-      const storedDark = localStorage.getItem('bib_theme') === 'dark';
-      applyTheme(storedDark);
-      
-      // 2. Adiciona listener ao botão de tema
-      if(btnTema) btnTema.addEventListener('click', toggleTheme);
+  document.addEventListener('DOMContentLoaded', initialize);
 
-      // --- Inicialização Principal ---
-      init();
-  });
   </script>
-
 </body>
 </html>
