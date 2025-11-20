@@ -69,7 +69,7 @@
     }
     
     /* Ajuste para o scroll suave no modal de configurações */
-    #settingsModalContent, #glossaryModalContent, #privacyModalContent { max-height: 90vh; overflow-y: auto; }
+    #settingsModalContent, #glossaryModalContent, #privacyModalContent, #authorModalContent, #reviewerModalContent { max-height: 90vh; overflow-y: auto; }
 
   </style>
 </head>
@@ -116,9 +116,11 @@
   
   <main class="p-4 sm:p-6 flex-1 overflow-auto">
     
-    <div class="max-w-7xl mx-auto flex gap-4 text-sm font-medium border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 px-1">
-        <a id="linkPrivacidade" href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Privacidade (LGPD)</a>
-        <button id="btnAbrirGlossario" class="text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Glossário / Ajuda</button>
+    <div class="max-w-7xl mx-auto flex gap-4 text-sm font-medium border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 px-1 overflow-x-auto">
+        <a id="linkPrivacidade" href="#" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Privacidade (LGPD)</a>
+        <button id="btnAbrirGlossario" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Glossário / Ajuda</button>
+        <button id="btnAbrirAuthor" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Biografia do Autor</button>
+        <button id="btnAbrirReviewer" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Biografia do Revisor</button>
     </div>
     
     <section id="paginaSelecao" class="pagina max-w-7xl mx-auto w-full">
@@ -260,6 +262,34 @@
     </div>
 </div>
 
+<div id="authorModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+    <div id="authorModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-lg shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-2xl font-extrabold text-primary-500" id="authorModalTitle"></h3>
+            <button id="fecharAuthorModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="x" class="lucide w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div id="authorContentArea" class="space-y-4 text-gray-700 dark:text-gray-300">
+            </div>
+    </div>
+</div>
+
+<div id="reviewerModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4 transition-opacity duration-300" style="opacity:0;" aria-modal="true" role="dialog">
+    <div id="reviewerModalContent" class="bg-white dark:bg-gray-800 p-6 rounded-3xl w-full max-w-lg shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-2xl font-extrabold text-primary-500" id="reviewerModalTitle"></h3>
+            <button id="fecharReviewerModal" class="p-1 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i data-lucide="x" class="lucide w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div id="reviewerContentArea" class="space-y-4 text-gray-700 dark:text-gray-300">
+            </div>
+    </div>
+</div>
+
   <footer class="mt-12 py-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-600 dark:text-gray-400">
     <p class="italic">© 2025 Alex Silva. Uso livre com atribuição.</p>
   </footer>
@@ -351,7 +381,15 @@
           { icon: 'chevrons-right', text: '<strong>Dia Não Lido (Pendente)</strong>: Leitura ainda não marcada como lida.' },
           { icon: 'star', text: '<strong>Dia Atual/Em Dia (Borda Azul Grossa)</strong>: Marca o dia de leitura esperado (o dia que você está hoje no plano).' },
           { icon: '📊', text: '<strong>Status de Acompanhamento</strong>: Textos como "Atrasado (X dias)" ou "Adiantado (Y dias)" aparecem se houver uma data de início definida, indicando sua posição em relação ao progresso esperado.' }
-      ]
+      ],
+      
+      // NOVO: Textos para Biografia (Autor e Revisor)
+      author_link: 'Biografia do Autor',
+      author_title: 'Sobre o Autor – Alex S. Lima Silva',
+      author_bio: `É Mestre em Teologia e dedica-se ao ensino bíblico há mais de 15 anos. Sua missão é fornecer estudos, cursos e devocionais de forma totalmente gratuita, promovendo o crescimento em Cristo`,
+      reviewer_link: 'Biografia do Revisor',
+      reviewer_title: 'Biografia do Revisor',
+      reviewer_bio_empty: 'A biografia do revisor será adicionada em breve.'
     },
     en: {
         titulo: 'Bible Plan',
@@ -433,7 +471,15 @@
             { icon: 'chevrons-right', text: '<strong>Day Not Read (Pending)</strong>: Reading not yet marked as read.' },
             { icon: 'star', text: '<strong>Current/On Schedule Day (Thick Blue Border)</strong>: Marks the expected reading day (the day you are on in the plan today).' },
             { icon: '📊', text: '<strong>Tracking Status</strong>: Texts like "Behind (X days)" or "Ahead (Y days)" appear if a start date is defined, indicating your position relative to the expected progress.' }
-        ]
+        ],
+        
+        // NOVO: Textos para Biografia (Autor e Revisor)
+        author_link: 'Author Biography',
+        author_title: 'About Me – Alex S. Lima Silva',
+        author_bio: `I am Alex S. Lima Silva, 45 years old, Master in Theology and passionate about teaching the Word of God. I have worked for over 10 years as a Professor of Theology and 15 years as a Sunday School Teacher, always aiming to make the Scriptures accessible, understandable, and transformative. Evangelical since the age of 5, I have walked with Christ since childhood and am currently a member of a Baptist Church, where I serve with dedication and joy. My family life is a great blessing: I have been married for 18 years to Loraly and am the father of Daniel and Sophia, who are a fundamental part of my ministry and my Christian journey. All the content I produce — studies, courses, devotionals, and biblical materials — is offered entirely free and non-profit. I believe that the Word of God should reach lives without barriers, and this project was born precisely to edify, teach, and strengthen those who seek to grow in faith. My commitment is to clearly, biblically, and foundationally spread the gospel, always pointing to Christ and a life of authentic discipleship.`,
+        reviewer_link: 'Reviewer Biography',
+        reviewer_title: 'Reviewer Biography',
+        reviewer_bio_empty: 'The reviewer\'s biography will be added soon.'
     },
     es: {
         titulo: 'Plan Bíblico',
@@ -507,7 +553,7 @@
         glossary_features: [
             { icon: 'calendar', text: '<strong>Plan Activo (Círculo Azul)</strong>: Indica el plan de lectura que está en uso actualmente.' },
             { icon: '⚙️', text: '<strong>Ajustes</strong>: Permite cambiar la duración del plan (1 año, 6 meses, 3 meses), restablecer el progreso o cambiar de plan.' },
-            { icon: '📖', text: '<strong>"Leer ahora" Botón</strong>: Abre los versículos de lectura en uma nova pestaña en Bible Gateway, en la versión (NVI-ES/NIV) correspondiente al idioma de la aplicación.' }
+            { icon: '📖', text: '<strong>"Leer ahora" Botón</strong>: Abre los versículos de lectura en uma nova pestaña en Bible Gateway, en la versión (NVI-ES/NIV) correspondente al idioma de la aplicación.' }
         ],
         glossary_icons_title: 'Iconos en los Días de Lectura',
         glossary_icons: [
@@ -515,7 +561,15 @@
             { icon: 'chevrons-right', text: '<strong>Día No Leído (Pendiente)</strong>: Lectura aún no marcada como leída.' },
             { icon: 'star', text: '<strong>Día Actual/Al Día (Borde Azul Grueso)</strong>: Marca el día de lectura esperado (el día en que se encuentra hoy en el plan).' },
             { icon: '📊', text: '<strong>Estado de Seguimiento</strong>: Textos como "Atrasado (X días)" ou "Adelantado (Y días)" aparecem si hay una fecha de inicio definida, indicando su posición relativa al progreso esperado.' }
-        ]
+        ],
+        
+        // NOVO: Textos para Biografia (Autor e Revisor)
+        author_link: 'Biografía del Autor',
+        author_title: 'Sobre Mí – Alex S. Lima Silva',
+        author_bio: `Soy Alex S. Lima Silva, 45 años, Máster en Teología y apasionado por la enseñanza de la Palabra de Dios. He trabajado durante más de 10 años como Profesor de Teología y 15 años como Profesor de Escuela Bíblica Dominical, siempre con el propósito de hacer las Escrituras accesibles, comprensibles y transformadoras. Evangélico desde los 5 años, camino con Cristo desde la infancia y actualmente soy miembro de una Iglesia Bautista, donde sirvo con dedicación y alegría. Mi vida familiar es una gran bendición: estoy casado hace 18 años con Loraly y soy padre de Daniel y Sophia, quienes son una parte fundamental de mi ministerio y mi jornada cristiana. Todo el contenido que produzco — estudios, cursos, devocionales y materiales bíblicos — se ofrece de forma totalmente gratuita y sin fines de lucro. Creo que la Palabra de Dios debe alcanzar vidas sin barreras, y este proyecto nació precisamente para edificar, enseñar y fortalecer a quienes buscan crecer en la fe. Mi compromiso es difundir el evangelio de forma clara, bíblica y fundamentada, señalando siempre a Cristo y a una vida de discipulado auténtico.`,
+        reviewer_link: 'Biografía del Revisor',
+        reviewer_title: 'Biografía del Revisor',
+        reviewer_bio_empty: 'La biografía del revisor se añadirá pronto.'
     }
   };
   
@@ -1505,6 +1559,10 @@
     // Atualiza links de rodapé
     if(document.getElementById('linkPrivacidade')) document.getElementById('linkPrivacidade').innerText = texts.privacy_link;
     if(document.getElementById('btnAbrirGlossario')) document.getElementById('btnAbrirGlossario').innerText = texts.glossary_link;
+    // NOVO: Atualiza links de biografia
+    if(document.getElementById('btnAbrirAuthor')) document.getElementById('btnAbrirAuthor').innerText = texts.author_link;
+    if(document.getElementById('btnAbrirReviewer')) document.getElementById('btnAbrirReviewer').innerText = texts.reviewer_link;
+
 
     // Garante que o progresso seja atualizado com os novos textos
     updateProgressUI();
@@ -1793,7 +1851,7 @@
       document.getElementById('privacyContentArea').innerHTML = `
           <p class="text-base font-medium">${texts.privacy_p1}</p>
           <p class="text-sm italic text-gray-500 dark:text-gray-400 border-t pt-4 border-gray-200 dark:border-gray-700">
-              
+              <i data-lucide="alert-triangle" class="lucide w-4 h-4 inline mr-1 text-yellow-500"></i> ${texts.privacy_title.replace(' (LGPD)', '')}: ${texts.privacy_p1.includes('JSON') ? 'O único momento em que há transferência de dados é quando VOCÊ usa a função "Exportar Progresso JSON" para fazer um backup manual. Fora disso, nada sai do seu dispositivo.' : 'Local storage only.'}
           </p>
       `;
   }
@@ -1875,6 +1933,105 @@
   document.getElementById('fecharGlossaryModal').addEventListener('click', closeGlossaryModal);
   glossaryModal.addEventListener('click', (e) => {
     if(e.target.id === 'glossaryModal') closeGlossaryModal();
+  });
+
+
+  // --- NOVO: LÓGICA DO MODAL DE AUTOR (Alex S. Lima Silva) ---
+  const authorModal = document.getElementById('authorModal');
+  const authorModalContent = document.getElementById('authorModalContent');
+  const authorContentArea = document.getElementById('authorContentArea');
+
+  function openAuthorModal() {
+      const texts = UI_TEXT[state.idioma];
+      renderAuthorContent(texts); 
+
+      authorModal.classList.remove('hidden');
+      setTimeout(() => {
+          authorModal.style.opacity = '1';
+          authorModalContent.classList.remove('scale-95');
+      }, 10);
+      
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closeAuthorModal() {
+      authorModal.style.opacity = '0';
+      authorModalContent.classList.add('scale-95');
+      setTimeout(() => authorModal.classList.add('hidden'), 300);
+  }
+
+  function renderAuthorContent(texts) {
+    document.getElementById('authorModalTitle').innerText = texts.author_title;
+    
+    // A biografia do autor com parágrafos
+    const bioParagraphs = texts.author_bio.split('. ').map(p => p.trim()).filter(p => p.length > 0).map(p => `<p class="text-base">${p}.</p>`).join('');
+
+authorContentArea.innerHTML = `
+                <div class="flex flex-col items-center pb-0 border-b border-gray-200 dark:border-gray-700">
+            
+            <img 
+                src="img/autor.jpeg" 
+                alt="Foto do Autor" 
+                class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-full object-cover shadow-xl border-4 border-primary-500"
+            />
+            
+        </div>
+
+        <div class="pt-0">
+            <div class="mt-0 space-y-4">
+                ${bioParagraphs}
+            </div>
+        </div>
+`;
+  }
+  
+  document.getElementById('btnAbrirAuthor').addEventListener('click', openAuthorModal);
+  document.getElementById('fecharAuthorModal').addEventListener('click', closeAuthorModal);
+  authorModal.addEventListener('click', (e) => {
+    if(e.target.id === 'authorModal') closeAuthorModal();
+  });
+
+
+  // --- NOVO: LÓGICA DO MODAL DE REVISOR (Em Branco) ---
+  const reviewerModal = document.getElementById('reviewerModal');
+  const reviewerModalContent = document.getElementById('reviewerModalContent');
+  const reviewerContentArea = document.getElementById('reviewerContentArea');
+
+  function openReviewerModal() {
+      const texts = UI_TEXT[state.idioma];
+      renderReviewerContent(texts); 
+
+      reviewerModal.classList.remove('hidden');
+      setTimeout(() => {
+          reviewerModal.style.opacity = '1';
+          reviewerModalContent.classList.remove('scale-95');
+      }, 10);
+      
+      if(window.lucide) window.lucide.createIcons();
+  }
+
+  function closeReviewerModal() {
+      reviewerModal.style.opacity = '0';
+      reviewerModalContent.classList.add('scale-95');
+      setTimeout(() => reviewerModal.classList.add('hidden'), 300);
+  }
+
+  function renderReviewerContent(texts) {
+    document.getElementById('reviewerModalTitle').innerText = texts.reviewer_title;
+    
+    // Conteúdo em Branco, como solicitado
+    reviewerContentArea.innerHTML = `
+        <div class="flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-700 rounded-xl">
+            <i data-lucide="edit" class="lucide w-10 h-10 text-primary-500 mb-4"></i>
+            <p class="text-lg font-semibold text-center">${texts.reviewer_bio_empty}</p>
+        </div>
+    `;
+  }
+  
+  document.getElementById('btnAbrirReviewer').addEventListener('click', openReviewerModal);
+  document.getElementById('fecharReviewerModal').addEventListener('click', closeReviewerModal);
+  reviewerModal.addEventListener('click', (e) => {
+    if(e.target.id === 'reviewerModal') closeReviewerModal();
   });
 
 
