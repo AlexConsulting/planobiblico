@@ -117,10 +117,10 @@
   <main class="p-4 sm:p-6 flex-1 overflow-auto">
     
     <div class="max-w-7xl mx-auto flex gap-4 text-sm font-medium border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 px-1 overflow-x-auto">
-        <a id="linkPrivacidade" href="#" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Privacidade (LGPD)</a>
-        <button id="btnAbrirGlossario" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Glossário / Ajuda</button>
-        <button id="btnAbrirAuthor" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Biografia do Autor</button>
-        <button id="btnAbrirReviewer" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Biografia do Revisor</button>
+        <a id="linkPrivacidade" href="#" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Privacidade</a>
+        <button id="btnAbrirGlossario" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Glossário</button>
+        <button id="btnAbrirAuthor" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Bio. do Autor</button>
+        <button id="btnAbrirReviewer" class="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-primary-500 transition">Bio. do Revisor</button>
     </div>
     
     <section id="paginaSelecao" class="pagina max-w-7xl mx-auto w-full">
@@ -312,7 +312,7 @@
         { id: 'tradicional', title: 'Tradicional', desc: 'Gênesis → Apocalipse (padrão)' },
         { id: 'cronologico', title: 'Cronológico', desc: 'Ordem histórica aproximada' },
         { id: 'atnt', title: 'AT + NT', desc: 'Um trecho do AT e um do NT por dia' },
-        { id: 'jesus', title: 'Um Ano com Jesus', desc: 'Evangelhos → Atos → Cartas → Resto' },
+        { id: 'jesus', title: 'Um Ano com Jesus', desc: 'Evangelhos → Atos → Demais Cartas' },
         { id: 'umcap', title: '1 Capítulo/Dia', desc: '1 capítulo por dia (365 seleções)' },
         { id: 'salmos', title: 'AT+NT+Salmos', desc: 'AT + NT + Salmo/Provérbio diário' }
       ],
@@ -355,11 +355,11 @@
       confirm_erase: 'Sim, Apagar Histórico', 
       
       // NOVO: Textos para Links Adicionais
-      privacy_link: 'Privacidade (LGPD)',
-      glossary_link: 'Glossário / Ajuda',
+      privacy_link: 'Privacidade',
+      glossary_link: 'Glossário',
 
       // NOVO: Textos de Privacidade
-      privacy_title: 'Privacidade (LGPD)',
+      privacy_title: 'Privacidade',
       privacy_p1: 'Nenhum dado é enviado, armazenado ou acessado por servidores externos ou pelo desenvolvedor. O único armazenamento ocorre localmente no seu dispositivo (se você usar a função \'Exportar Progresso JSON\').',
       
       // NOVO: Textos para Botão de Iniciar/Ver Plano
@@ -368,7 +368,7 @@
       view_plan: 'Ver Plano', // NOVO
       
       // NOVO: Textos do Glossário (Removida referência ao botão HOJE)
-      glossary_title: 'Glossário / Ajuda',
+      glossary_title: 'Glossário',
       glossary_features_title: 'Funcionalidades Principais',
       glossary_features: [
           { icon: 'calendar', text: '<strong>Plano Ativo (Círculo Azul)</strong>: Indica o plano de leitura que está em uso no momento.' },
@@ -384,11 +384,11 @@
       ],
       
       // NOVO: Textos para Biografia (Autor e Revisor)
-      author_link: 'Biografia do Autor',
+      author_link: 'Bio. do Autor',
       author_title: 'Sobre o Autor – Alex S. Lima Silva',
-      author_bio: `É Mestre em Teologia e dedica-se ao ensino bíblico há mais de 15 anos. Sua missão é fornecer estudos, cursos e devocionais de forma totalmente gratuita, promovendo o crescimento em Cristo`,
-      reviewer_link: 'Biografia do Revisor',
-      reviewer_title: 'Biografia do Revisor',
+      author_bio: `Tem 45 anos, é Mestre em Teologia e dedica-se ao ensino bíblico há mais de 15 anos. Sua missão é fornecer estudos, cursos e devocionais de forma totalmente gratuita, promovendo o crescimento em Cristo`,
+      reviewer_link: 'Bio. do Revisor',
+      reviewer_title: 'Bio. do Revisor',
       reviewer_bio_empty: 'A biografia do revisor será adicionada em breve.'
     },
     en: {
@@ -445,11 +445,11 @@
         confirm_erase: 'Yes, Erase History',
 
         // NOVO: Textos para Links Adicionais
-        privacy_link: 'Privacy (LGPD)',
-        glossary_link: 'Glossary / Help',
+        privacy_link: 'Privacy',
+        glossary_link: 'Glossary',
         
         // NOVO: Textos de Privacidade
-        privacy_title: 'Privacy (LGPD)',
+        privacy_title: 'Privacy',
         privacy_p1: 'No data is sent, stored, or accessed by external servers or the developer. The only storage occurs locally on your device (if you use the \'Export Progress JSON\' function).',
 
         // NOVO: Textos para Botão de Iniciar/Ver Plano
@@ -458,7 +458,7 @@
         view_plan: 'View Plan', // NOVO
 
         // NOVO: Textos do Glossário (Removida referência ao botão HOJE)
-        glossary_title: 'Glossary / Help',
+        glossary_title: 'Glossary',
         glossary_features_title: 'Key Features',
         glossary_features: [
             { icon: 'calendar', text: '<strong>Active Plan (Blue Circle)</strong>: Indicates the reading plan currently in use.' },
@@ -474,11 +474,11 @@
         ],
         
         // NOVO: Textos para Biografia (Autor e Revisor)
-        author_link: 'Author Biography',
-        author_title: 'About Me – Alex S. Lima Silva',
-        author_bio: `I am Alex S. Lima Silva, 45 years old, Master in Theology and passionate about teaching the Word of God. I have worked for over 10 years as a Professor of Theology and 15 years as a Sunday School Teacher, always aiming to make the Scriptures accessible, understandable, and transformative. Evangelical since the age of 5, I have walked with Christ since childhood and am currently a member of a Baptist Church, where I serve with dedication and joy. My family life is a great blessing: I have been married for 18 years to Loraly and am the father of Daniel and Sophia, who are a fundamental part of my ministry and my Christian journey. All the content I produce — studies, courses, devotionals, and biblical materials — is offered entirely free and non-profit. I believe that the Word of God should reach lives without barriers, and this project was born precisely to edify, teach, and strengthen those who seek to grow in faith. My commitment is to clearly, biblically, and foundationally spread the gospel, always pointing to Christ and a life of authentic discipleship.`,
-        reviewer_link: 'Reviewer Biography',
-        reviewer_title: 'Reviewer Biography',
+        author_link: 'Author Bio.',
+        author_title: 'About the Author – Silva, Alex S. Lima',
+        author_bio: `He is 45 years old, holds a Master's degree in Theology, and has dedicated himself to biblical teaching for over 15 years. His mission is to provide studies, courses, and devotional materials completely free of charge, promoting growth in Christ`,
+        reviewer_link: 'Reviewer Bio.',
+        reviewer_title: 'Reviewer Bio.',
         reviewer_bio_empty: 'The reviewer\'s biography will be added soon.'
     },
     es: {
@@ -535,11 +535,11 @@
         confirm_erase: 'Sí, Borrar Historial',
         
         // NOVO: Textos para Links Adicionais
-        privacy_link: 'Privacidad (LGPD)',
-        glossary_link: 'Glosario / Ayuda',
+        privacy_link: 'Privacidad',
+        glossary_link: 'Glosario',
 
         // NOVO: Textos de Privacidade
-        privacy_title: 'Privacidad (LGPD)',
+        privacy_title: 'Privacidad',
         privacy_p1: 'Ningún dato es enviado, almacenado o accedido por servidores externos o por el desarrollador. El único almacenamiento ocurre localmente en su dispositivo (si usa la función \'Exportar Progreso JSON\').',
         
         // NOVO: Textos para Botão de Iniciar/Ver Plano
@@ -548,7 +548,7 @@
         view_plan: 'Ver Plan', // NOVO
 
         // NOVO: Textos do Glossário (Removida referência ao botão HOJE)
-        glossary_title: 'Glosario / Ayuda',
+        glossary_title: 'Glosario',
         glossary_features_title: 'Características Principales',
         glossary_features: [
             { icon: 'calendar', text: '<strong>Plan Activo (Círculo Azul)</strong>: Indica el plan de lectura que está en uso actualmente.' },
@@ -564,11 +564,11 @@
         ],
         
         // NOVO: Textos para Biografia (Autor e Revisor)
-        author_link: 'Biografía del Autor',
-        author_title: 'Sobre Mí – Alex S. Lima Silva',
-        author_bio: `Soy Alex S. Lima Silva, 45 años, Máster en Teología y apasionado por la enseñanza de la Palabra de Dios. He trabajado durante más de 10 años como Profesor de Teología y 15 años como Profesor de Escuela Bíblica Dominical, siempre con el propósito de hacer las Escrituras accesibles, comprensibles y transformadoras. Evangélico desde los 5 años, camino con Cristo desde la infancia y actualmente soy miembro de una Iglesia Bautista, donde sirvo con dedicación y alegría. Mi vida familiar es una gran bendición: estoy casado hace 18 años con Loraly y soy padre de Daniel y Sophia, quienes son una parte fundamental de mi ministerio y mi jornada cristiana. Todo el contenido que produzco — estudios, cursos, devocionales y materiales bíblicos — se ofrece de forma totalmente gratuita y sin fines de lucro. Creo que la Palabra de Dios debe alcanzar vidas sin barreras, y este proyecto nació precisamente para edificar, enseñar y fortalecer a quienes buscan crecer en la fe. Mi compromiso es difundir el evangelio de forma clara, bíblica y fundamentada, señalando siempre a Cristo y a una vida de discipulado auténtico.`,
-        reviewer_link: 'Biografía del Revisor',
-        reviewer_title: 'Biografía del Revisor',
+        author_link: 'Bio. del Autor',
+        author_title: 'Acerca del autor – Alex S. Lima Silva',
+        author_bio: `Tiene 45 años, es licenciado en Teología y se ha dedicado a la enseñanza bíblica durante más de 15 años. Su misión es ofrecer estudios, cursos y materiales devocionales completamente gratuitos, fomentando así el crecimiento espiritual en Cristo`,
+        reviewer_link: 'Bio. del Revisor',
+        reviewer_title: 'Bio. del Revisor',
         reviewer_bio_empty: 'La biografía del revisor se añadirá pronto.'
     }
   };
@@ -1851,7 +1851,7 @@
       document.getElementById('privacyContentArea').innerHTML = `
           <p class="text-base font-medium">${texts.privacy_p1}</p>
           <p class="text-sm italic text-gray-500 dark:text-gray-400 border-t pt-4 border-gray-200 dark:border-gray-700">
-              <i data-lucide="alert-triangle" class="lucide w-4 h-4 inline mr-1 text-yellow-500"></i> ${texts.privacy_title.replace(' (LGPD)', '')}: ${texts.privacy_p1.includes('JSON') ? 'O único momento em que há transferência de dados é quando VOCÊ usa a função "Exportar Progresso JSON" para fazer um backup manual. Fora disso, nada sai do seu dispositivo.' : 'Local storage only.'}
+              
           </p>
       `;
   }
